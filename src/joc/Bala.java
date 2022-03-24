@@ -9,7 +9,8 @@ public class Bala {
 	static int bulletDamage = 10;
 	Joc joc;
 	public Bala(Joc joc){
-		vBalesNau = Math.abs((int) (joc.c.Vx+18)); //MASSA! POTSER NO CAL TENIR 2 VARIABLES PER VELOCITAT NSE 
+		vBalesNau = Math.abs((int) (joc.c.Vx/10+18)); //MASSA! POTSER NO CAL TENIR 2 VARIABLES PER VELOCITAT NSE 
+		xInicial = Nau.x+joc.c.xFisiques+50;
 		yInicial=Nau.y+14+joc.c.yFisiques;
 		this.xoc=false; 
 		isVisible=true;

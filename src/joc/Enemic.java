@@ -21,8 +21,7 @@ public abstract class Enemic {
 		this.joc=joc;
 		this.calculatXoc = false;
 		xInicial=Finestra.AMPLADA+100+joc.c.xFisiques;
-		yInicial = Nau.y;
-		//yInicial=Joc.r.nextInt(maxGeneracio*2)-maxGeneracio+joc.c.yFisiques; //genera un numero random de l'interval [-maxGeneracio,maxGeneracio].
+		yInicial=Joc.r.nextInt(maxGeneracio*2)-maxGeneracio+joc.c.yFisiques; //genera un numero random de l'interval [-maxGeneracio,maxGeneracio].
 		x=xInicial;
 		y=yInicial;
 		varX=0;

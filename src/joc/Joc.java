@@ -32,7 +32,6 @@ public class Joc implements KeyListener{
 	void run() { 
 		Inicialitzacio();
 			while(true) {
-				System.out.println(c.Vx); 
 				moviments();
 				generacioEnemics();
 				xocs(); 
@@ -214,17 +213,16 @@ public class Joc implements KeyListener{
 			enemics.add(new Meteorit1(this));
 		}
 		if(r.nextInt(30)>nivellDificultat("meteoritGran",22)) {
-			//enemics.add(new Meteorit2(this));
+			enemics.add(new Meteorit2(this));
 			if(r.nextInt(30)>16) { //donem alguna probabilitat diferent de zero a que ens apareixin meteorits grans esquerdats 
-				//enemics.get(enemics.size()-1).xoc=1;
+				enemics.get(enemics.size()-1).xoc=1;
 			}
 		} 
 		if(r.nextInt(100)>nivellDificultat("enemic",98)) {
-			//enemics.add(new NauEnemiga1(this));
+			enemics.add(new NauEnemiga1(this));
 		}
 	
 		//GENERACIÓ ESTRELLES, SUPOSO QUE MÉS ENDAVANT FAREM UNA FUNCIÓ QUE ES DIGUI GENERAMAPA O POTSER GENERAFONS
-		//(ja funciona s'ha de retocar el 200 obviament)
 		if(r.nextInt(100)>30) {
 			estrelles.add(new Estrella(this));
 		}
