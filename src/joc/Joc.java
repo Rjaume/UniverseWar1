@@ -32,7 +32,6 @@ public class Joc implements KeyListener{
 	void run() { 
 		Inicialitzacio();
 			while(true) {
-				System.out.println( Math.abs((int) (c.Vx/10+18))); 
 				moviments();
 				generacioEnemics();
 				xocs(); 
