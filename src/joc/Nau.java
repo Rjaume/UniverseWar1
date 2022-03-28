@@ -13,6 +13,7 @@ public class Nau implements KeyListener {
 	int nbales; //conta el nombre de bales que queden a la nau. 
 	int n; //l'usem per a l'animació
 	static int llargada = 50, altura = 32;
+	static int llargadaMinimapa = 2, alturaMinimapa = 2;
 	int tempsUltimXoc;
 	static int x=Finestra.AMPLADA/2-25,y=Finestra.ALTURA/2-16; //posició on pintem la nau (el centre de la finestra).
 	static int vidaMaxima = 100; //vida maxima de la nau, cada xoc ens traurà un nombre determinat de vida 

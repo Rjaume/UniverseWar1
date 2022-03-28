@@ -15,6 +15,8 @@ public class ForatNegre extends Enemic{
 		isNegligible = false;
 		llargada = 33;
 		altura = 33;
+		llargadaMinimapa = 2;
+		alturaMinimapa = 2;
 	}
 	
 	@Override

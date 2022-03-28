@@ -23,6 +23,8 @@ public class Meteorit1 extends Enemic {
 		}
 		llargada=34;
 		altura=34;
+		llargadaMinimapa = 2;
+		alturaMinimapa=2;
 		vida=1;
 	}
 	void pinta(Graphics g) {
@@ -32,12 +34,7 @@ public class Meteorit1 extends Enemic {
 		x=xInicial-joc.c.xFisiques+varX;
 		y=yInicial-joc.c.yFisiques;
 		varX-=v;
-		if(Math.abs(Nau.x-this.x)>1500 || Math.abs(Nau.y+joc.c.yFisiques-this.y)>1500) {
-			isVisible=false;
-		}else {
-			isVisible=true;
 		}
-	}
 	void dispara() {
 		
 	}
