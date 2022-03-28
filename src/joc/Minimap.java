@@ -38,8 +38,5 @@ public class Minimap {
 				g.fillRect(xM,yM,enemic.llargadaMinimapa,enemic.alturaMinimapa);
 			}
 		}
-		/*Com ho fem? Puc posar true a un boolean als enemics que ens indiqui si un element està prou a prop de la nau com per ser 
-		 * vist al minimapa i aqui loopejar per tots els enemics dibuixant (amb posició escalada) als enemics amb aquest boolean true*/
-		
 	}
 }
