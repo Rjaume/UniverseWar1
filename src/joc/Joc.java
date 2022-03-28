@@ -17,6 +17,7 @@ public class Joc implements KeyListener{
 	Graphics g;
 	Finestra f;
 	Nau c;
+	Minimap map;
 	boolean calculatRecords,apuntatTemps,inici,records,controls;
 	ContadorTemps contadorTemps; //l'usarem per a contar quants segons durem vius. 
 	ContadorBales contadorBales; //l'usarem per a escriure per pantalla les bales que ens queden 
@@ -49,6 +50,7 @@ public class Joc implements KeyListener{
 	void Inicialitzacio() {
 		loadResources(); //obtenim les imatges i fitxers que farem servir 
 		c=new Nau(this); //creem la nostra nau.
+		map = new Minimap(this); //creem el minimapa
 		contadorTemps=new ContadorTemps(this,g); //creem un nou contador
 		contadorBales=new ContadorBales(this);
 		f.addKeyListener(c);
@@ -154,6 +156,19 @@ public class Joc implements KeyListener{
 				if(enemics.get(i).mort==false && enemics.get(i).disparatRecentment==false) {
 					enemics.get(i).dispara();
 				}
+			}
+			//isVisible
+			if(Math.abs(Nau.x-enemics.get(i).x)>1500 || Math.abs(Nau.y-enemics.get(i).y)>1500) {
+				enemics.get(i).isVisible=false;
+			}else {
+				enemics.get(i).isVisible=true;
+			}
+			//isInMinmap
+			if(Math.abs(Nau.x-enemics.get(i).x)<1200 && Math.abs(Nau.y-enemics.get(i).y)<1200) {
+				enemics.get(i).isInMinimap = true;
+			}
+			else {
+				enemics.get(i).isInMinimap = false;
 			}
 		}
 		
@@ -273,8 +288,8 @@ public class Joc implements KeyListener{
 					enemics.get(i).pinta(g);
 				}
 			}
-			//DIBUIXEM NAU BARRA VIDA I BARRA MUNICIÓ
 			if(!c.mort) {
+				//DIBUIXEM NAU BARRA VIDA I BARRA MUNICIÓ
 				int dtemps = Math.abs(c.tempsUltimXoc-(int)System.currentTimeMillis()); //aqui regulem com ens avisa la nau que ha xocat amb un objecte
 				if(dtemps>750) {
 					c.isTargetable = true;
@@ -290,6 +305,8 @@ public class Joc implements KeyListener{
 				}
 				c.pintaBarraVida(g);
 				contadorBales.pinta();
+				//DIBUIXEM MINIMAPA
+				map.pinta();
 			}
 			//DIBUIXEM MENU FINAL
 			else {

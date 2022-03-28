@@ -16,6 +16,8 @@ public class Meteorit2 extends Enemic{
 		llargada=90;
 		altura=90;
 		vida=2;
+		alturaMinimapa = 6;
+		llargadaMinimapa = 6;
 		balesInicials=0; //els meteorits no tenen bales
 	}
 	
@@ -31,11 +33,6 @@ public class Meteorit2 extends Enemic{
 		x=xInicial-joc.c.xFisiques+varX;
 		y=yInicial-joc.c.yFisiques;
 		varX-=v;
-		if(Math.abs(Nau.x-this.x)>1500 || Math.abs(Nau.y-this.y)>1500) {
-			isVisible=false;
-		}else {
-			isVisible=true;
-			}
 	}
 	void dispara() {
 	}

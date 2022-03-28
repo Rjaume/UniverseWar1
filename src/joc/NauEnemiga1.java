@@ -15,6 +15,8 @@ public class NauEnemiga1 extends Enemic {
 		this.mort=false;
 		llargada=50;
 		altura=50;
+		alturaMinimapa = 4;
+		llargadaMinimapa = 4;
 		vida=1;
 		this.nauEnemiga1=joc.enemic1;
 		isVisible=true;
@@ -28,11 +30,6 @@ public class NauEnemiga1 extends Enemic {
 		x=xInicial-joc.c.xFisiques+varX;
 		y=yInicial-joc.c.yFisiques;
 		varX-=v;
-			if(Math.abs(Nau.x-this.x)>1500 || Math.abs(Nau.y-this.y)>1500) {
-				isVisible=false;
-			}else {
-				isVisible=true;
-			}
 	}
 	void dispara() {
 		if(Math.abs(tempsUltimTret-System.currentTimeMillis())>tempsEntreTrets*1000) {
