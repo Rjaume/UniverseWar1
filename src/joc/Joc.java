@@ -33,6 +33,7 @@ public class Joc implements KeyListener{
 	void run() { 
 		Inicialitzacio();
 			while(true) {
+				c.isTargetable = false;
 				moviments();
 				generacioEnemics();
 				xocs(); 
@@ -148,17 +149,9 @@ public class Joc implements KeyListener{
 			c.bales[i].moureDreta();
 		
 		for(int i=0;i<enemics.size();i++) { //enemics
-			enemics.get(i).moure();
-			if(enemics.get(i) instanceof NauEnemiga1) {
-				for(int j=0;j<(enemics.get(i)).bales.size();j++) {
-					((enemics.get(i)).bales.get(j)).moureEsquerra();
-				}
-				if(enemics.get(i).mort==false && enemics.get(i).disparatRecentment==false) {
-					enemics.get(i).dispara();
-				}
-			}
+			
 			//isVisible
-			if(Math.abs(Nau.x-enemics.get(i).x)>1500 || Math.abs(Nau.y-enemics.get(i).y)>1500) {
+			if(Math.abs(Nau.x-enemics.get(i).x)>2000 || Math.abs(Nau.y-enemics.get(i).y)>2000) {
 				enemics.get(i).isVisible=false;
 			}else {
 				enemics.get(i).isVisible=true;
@@ -170,6 +163,16 @@ public class Joc implements KeyListener{
 			else {
 				enemics.get(i).isInMinimap = false;
 			}
+		
+			enemics.get(i).moure();
+			if(enemics.get(i) instanceof NauEnemiga1) {
+				for(int j=0;j<(enemics.get(i)).bales.size();j++) {
+					((enemics.get(i)).bales.get(j)).moureEsquerra();
+				}
+				if(enemics.get(i).mort==false && enemics.get(i).disparatRecentment==false) {
+					enemics.get(i).dispara();
+				}
+		}
 		}
 		
 		for(int i=0;i<estrelles.size();i++) {//estrelles de fons
@@ -190,16 +193,16 @@ public class Joc implements KeyListener{
 			}
 		}
 		//XOC NAU AMB ENEMICS
-		for(int i=0;i<enemics.size();i++) {
-			if (c.isTargetable && !enemics.get(i).calculatXoc) { //estem assumint que no podem xocar més d'un cop amb el mateix enemics, això podria canviar més endavant
-				if((Nau.y+30>enemics.get(i).y)&&(Nau.y<enemics.get(i).y+enemics.get(i).altura)&&(Math.abs(enemics.get(i).x-Nau.x)<=30)&&(enemics.get(i).xoc<enemics.get(i).vida)&&inici==false) { //hem de demanar que el meteorit no hagi estat matat i que no estiguem al menu inicial 
-					c.vida -= enemics.get(i).bodyDamage;
+		for(Enemic enemic : enemics) {
+			if (c.isTargetable && !enemic.calculatXoc) { //estem assumint que no podem xocar més d'un cop amb el mateix enemics, això podria canviar més endavant
+				if((Nau.y+30>enemic.y)&&(Nau.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-Nau.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false) { //hem de demanar que el meteorit no hagi estat matat i que no estiguem al menu inicial 
+					c.vida -= enemic.bodyDamage;
 					c.tempsUltimXoc = (int)System.currentTimeMillis();
-					enemics.get(i).calculatXoc = true;
+					enemic.calculatXoc = true;
 				}
 			}
-			else{ if(!((Nau.y+30>enemics.get(i).y)&&(Nau.y<enemics.get(i).y+enemics.get(i).altura)&&(Math.abs(enemics.get(i).x-Nau.x)<=30)&&(enemics.get(i).xoc<enemics.get(i).vida)&&inici==false)){
-				enemics.get(i).calculatXoc = false; //així podem xocar més d'un cop amb el mateix enemic
+			else{ if(!((Nau.y+30>enemic.y)&&(Nau.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-Nau.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false)){
+				enemic.calculatXoc = false; //així podem xocar més d'un cop amb el mateix enemic
 			}
 			}
 		}
@@ -271,7 +274,7 @@ public class Joc implements KeyListener{
 			}
 			//DIBUIXEM BALES
 			for(int i=0;i<c.nbales;i++){
-				if(c.bales[i].xoc==false && c.mort==false && c.bales[i].isVisible) { //si les bales no han xocat i la nau esta viva les pintem. 
+				if(c.bales[i].xoc==false && c.mort==false && c.bales[i].isVisible) { //si les bales no han xocat i la nau esta viva les pi)ntem. 
 				c.bales[i].pinta(g);
 				}
 			}
@@ -284,7 +287,7 @@ public class Joc implements KeyListener{
 			}
 			//DIBUIXEM ENEMICS
 			for(int i=0;i<enemics.size();i++) {
-				if(enemics.get(i).mort==false && enemics.get(i).isVisible) { 
+				if(!enemics.get(i).mort && enemics.get(i).isVisible) { 
 					enemics.get(i).pinta(g);
 				}
 			}

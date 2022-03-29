@@ -19,8 +19,6 @@ public class Minimap {
 	}
 	void pinta() {
 		//Layout
-		g.setColor(Color.WHITE);
-		g.drawRect(x-1,y-1,llargada,altura);
 		g.setColor(Color.BLACK);
 		g.fillRect(x,y,llargada-1,altura-1);
 		g.setColor(seethrough_gray);
@@ -32,11 +30,13 @@ public class Minimap {
 		g.setColor(Color.RED); 
 		for (Enemic enemic: joc.enemics) {
 			if(enemic.isInMinimap && !enemic.mort) {
-				System.out.println("hola");
 				int xM = xR+88*enemic.x/1200;
 				int yM = yR+58*enemic.y/800;
 				g.fillRect(xM,yM,enemic.llargadaMinimapa,enemic.alturaMinimapa);
 			}
 		}
+		//marc 
+		g.setColor(Color.WHITE);
+		g.drawRect(x-1,y-1,llargada,altura);
 	}
 }

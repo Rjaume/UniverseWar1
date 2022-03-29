@@ -21,12 +21,13 @@ public abstract class Enemic {
 	public Enemic(Joc joc) {
 		this.joc=joc;
 		this.calculatXoc = false;
+		//xInicial=2*Finestra.AMPLADA+joc.c.xFisiques;
 		xInicial=2*Finestra.AMPLADA+joc.c.xFisiques;
 		yInicial=Joc.r.nextInt(maxGeneracio*2)-maxGeneracio+joc.c.yFisiques; //genera un numero random de l'interval [-maxGeneracio,maxGeneracio].
 		x=xInicial;
 		y=yInicial;
 		varX=0;
-		isVisible=true;
+		isVisible=false;
 		calculatXoc = false;
 	}
 	abstract void pinta(Graphics g);

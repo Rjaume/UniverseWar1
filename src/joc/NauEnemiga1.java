@@ -19,7 +19,7 @@ public class NauEnemiga1 extends Enemic {
 		llargadaMinimapa = 4;
 		vida=1;
 		this.nauEnemiga1=joc.enemic1;
-		isVisible=true;
+		isVisible=false;
 		tempsUltimTret=0;
 	}
 	void pinta(Graphics g) {
