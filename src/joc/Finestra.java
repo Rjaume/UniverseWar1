@@ -1,11 +1,14 @@
 package joc;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 
 public class Finestra extends JFrame {
 	Joc j;
@@ -13,6 +16,7 @@ public class Finestra extends JFrame {
 	Image im; //tècnica doble buffer
 	Graphics g;
 	JLabel label1;
+	//static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0];
 	public static void main(String[] args) {
 		new Finestra();
 	}
@@ -20,11 +24,8 @@ public class Finestra extends JFrame {
 		super("Universe War I");
 		setSize(AMPLADA,ALTURA);
 		setVisible(true);
-		this.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				System.exit(0);
-			}
-		});
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		//setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		im=this.createImage(AMPLADA,ALTURA);
 		g=im.getGraphics();
 		j=new Joc(this);

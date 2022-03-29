@@ -30,11 +30,6 @@ public class ForatNegre extends Enemic{
 	void moure() { //Els forats negres no es mouen 	
 		x=xInicial-joc.c.xFisiques;
 		y=yInicial-joc.c.yFisiques;
-		if(Math.abs(x-Nau.x) >1500 || Math.abs(y-Nau.y)>1500) {
-			isVisible=false;
-		}else {
-			isVisible =true;
-		}
 		if(Math.abs(x-Nau.x)>maxDistanceOfAtraction || Math.abs(y-Nau.y)>maxDistanceOfAtraction) { 
 			this.isNegligible = true; //si la nau està massa lluny del forat negre aquest deixa de xuclar
 		}else {
