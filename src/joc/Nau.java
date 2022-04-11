@@ -11,11 +11,13 @@ public class Nau implements KeyListener {
 	static int balesInicials=50;
 	Bala bales[];
 	int nbales; //conta el nombre de bales que queden a la nau. 
-	int n; //l'usem per a l'animació
-	static int llargada = 50, altura = 32;
+	int n; //l'usem per a l'animació 
+	static float llargadaRelativa = (float)50./1440, alturaRelativa = (float)32./900;//mides de la nau, relatives a la mida de la pantalla. Son els quocients llargada/(amplada pantalla) i altura/(altura pantalla))
+	static int llargada,altura;
+	static int xBarraVida, yBarraVida=40, llargadaRectangleVida, alturaRectangleVida;  //fixem la posició de la barra de Vida que determina la de la barra de bales
 	static int llargadaMinimapa = 2, alturaMinimapa = 2;
 	int tempsUltimXoc;
-	static int x=Finestra.AMPLADA/2-25,y=Finestra.ALTURA/2-16; //posició on pintem la nau (el centre de la finestra).
+	static int x,y; //posició on pintem la nau (el centre de la finestra).
 	static int vidaMaxima = 100; //vida maxima de la nau, cada xoc ens traurà un nombre determinat de vida 
 	int vida;
 	static int xVida = 10, yVida = 10; //posició de la barra de vida 
@@ -30,6 +32,13 @@ public class Nau implements KeyListener {
 	
 	Nau(Joc joc){
 		this.joc=joc;
+		x=joc.f.AMPLADA/2-llargada/2;
+		y=joc.f.ALTURA/2-altura/2;
+		llargada = joc.llargadaNau;
+		altura = joc.alturaNau;
+		llargadaRectangleVida = joc.llargadaBarres;
+		alturaRectangleVida = joc.alturaBarres;
+		xBarraVida = Math.round(ContadorBales.xBarraRelativa*llargadaRectangleVida); //no pot ser que la barra ens xoqui amb el text
 		xFisiques=0;
 		yFisiques=0;
 		n=0;
@@ -79,13 +88,13 @@ public class Nau implements KeyListener {
 	}
 	void pintaBarraVida(Graphics g) {
 		g.setColor(Color.WHITE);
-		g.setFont(new Font("MyriadPro",Font.PLAIN,15));
-		g.drawString("health: ",15,60);
+		g.setFont(new Font("MyriadPro",Font.PLAIN,Math.round(ContadorBales.midaTextRelativa * alturaRectangleVida)));
+		g.drawString("health: ",15,yBarraVida + alturaRectangleVida);
 		g.setColor(Color.RED);
 		for(int i=0; i<=this.vida; i++) {
-			g.fillRect(90+i*2,50,2,10); //2 pixels equivalen a una unitat de vida
+			g.fillRect(xBarraVida+i*llargadaRectangleVida,yBarraVida,llargadaRectangleVida,alturaRectangleVida); 
 		}
-		g.drawRect(90,50,Nau.vidaMaxima*2,10);
+		g.drawRect(xBarraVida,yBarraVida,Nau.vidaMaxima*llargadaRectangleVida,alturaRectangleVida);
 	}
 	void restartValues() {
 		mort=false; //posem que la nau no s'ha mort 

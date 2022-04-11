@@ -5,7 +5,8 @@ import java.awt.image.BufferedImage;
 
 public class ForatNegre extends Enemic{
 	BufferedImage foratnegre;
-	static int maxDistanceOfAtraction=1000;
+	static float llargadaRelativa = (float)100./1440, alturaRelativa = (float)100./900; //mides relatives a la mida de la pantalla (té molt d'espai sobrant per posar llum per darrera)
+	static int maxDistanceOfAtraction=1000; //realment respecte aquesta mida de pantalla la part real del forat negre es 33x34. (*)
 	public ForatNegre(Joc joc) {
 		super(joc);
 		vida=10000;
@@ -13,16 +14,16 @@ public class ForatNegre extends Enemic{
 		campgravitatori = new CampGravitatori(joc,joc.c,this);
 		foratnegre = joc.foratnegre;
 		isNegligible = false;
-		llargada = 33;
-		altura = 33;
+		llargada = joc.llargadaForatNegre;
+		altura = joc.alturaForatNegre;
 		llargadaMinimapa = 2;
 		alturaMinimapa = 2;
 	}
 	
 	@Override
 	void pinta(Graphics g) {
-		g.drawImage(foratnegre,x-35,y-34,null); // de manera que x,y correspon a la part esquerre superior del meteorit 
-		//(doncs el png del meteorit té espai buit als voltants (per a tenir llum per darrera))
+		g.drawImage(foratnegre,x-Math.round((float)(33./100)*llargada),y-Math.round((float)(34./100)*llargada),null); // de manera que x,y correspon a la part esquerre superior del meteorit 
+		//(doncs el png del foratnegre té espai buit als voltants (per a tenir llum per darrera)) (*)
 		
 	}
 

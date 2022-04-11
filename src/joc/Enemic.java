@@ -14,15 +14,16 @@ public abstract class Enemic {
 	int M; //mass of the enemy, for the enemies in which physics apply (rn only blackholes)
 	boolean isNegligible; //si l'enemic es pot negligir per a les fisiques, for the enemies in which physics apply (rn only blackholes)
 	boolean isInMinimap; //true if the enemy is in range of the minimap 
-	static int maxGeneracio=3*Finestra.ALTURA/2+1000;
+	int maxGeneracio;
 	Joc joc;
 	ArrayList<Bala> bales = new ArrayList<Bala>();
 	boolean mort;
 	public Enemic(Joc joc) {
 		this.joc=joc;
 		this.calculatXoc = false;
+		maxGeneracio = 3*joc.f.ALTURA/2+1000;
 		//xInicial=2*Finestra.AMPLADA+joc.c.xFisiques;
-		xInicial=2*Finestra.AMPLADA+joc.c.xFisiques;
+		xInicial=2*joc.f.AMPLADA+joc.c.xFisiques;
 		yInicial=Joc.r.nextInt(maxGeneracio*2)-maxGeneracio+joc.c.yFisiques; //genera un numero random de l'interval [-maxGeneracio,maxGeneracio].
 		x=xInicial;
 		y=yInicial;

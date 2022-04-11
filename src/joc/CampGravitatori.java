@@ -18,16 +18,16 @@ public class CampGravitatori {
 	double Fx() {
 		double xCEnemy = e.x+e.llargada/2; //punts centrals de cada objecte
 		double yCEnemy = e.y+e.altura/2;
-		double xCNau = Nau.x+Nau.llargada/2;
-		double yCNau = Nau.y+Nau.altura/2;
+		double xCNau = c.x+Nau.llargada/2;
+		double yCNau = c.y+Nau.altura/2;
 		distq=Math.pow(xCEnemy-xCNau, 2)+Math.pow(yCEnemy-yCNau,2);
 		return(K*(xCEnemy-xCNau)/Math.pow(distq,3/2));
 	}
 	double Fy() {
 		double xCEnemy = e.x+e.llargada/2; //punts centrals de cada objecte
 		double yCEnemy = e.y+e.altura/2;
-		double xCNau = Nau.x+Nau.llargada/2;
-		double yCNau = Nau.y+Nau.altura/2;
+		double xCNau = c.x+Nau.llargada/2;
+		double yCNau = c.y+Nau.altura/2;
 		distq=Math.pow(xCEnemy-xCNau, 2)+Math.pow(yCEnemy-yCNau,2);
 		return(K*(yCEnemy-yCNau)/Math.pow(distq,3/2));
 	}

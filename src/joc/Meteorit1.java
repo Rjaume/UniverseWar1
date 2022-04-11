@@ -4,7 +4,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class Meteorit1 extends Enemic {
-	BufferedImage Imatge;
+	BufferedImage Imatge;//
+	static float llargadaRelativa[] = new float[] {(float)78./1440, (float)78./1440,(float)34./1440 };
+	static float alturaRelativa = (float)34./900; //mides relatives a la mida de la pantalla
+	int llargada[] = new int[3]; //llargada depen de si tenim més foc o menys
 	//número que es restarà a la vida de la nau cada cop que xoquem amb aquest tipus de meteorit
 	public Meteorit1(Joc joc){
 		super(joc);
@@ -21,8 +24,10 @@ public class Meteorit1 extends Enemic {
 		if(this.v>16) {
 			this.Imatge=joc.imatgesMeteorits[0];
 		}
-		llargada=34;
-		altura=34;
+		for(int i=0;i<3;i++) {
+			llargada[i] = joc.llargadaMeteorit1[i];
+		}
+		altura=joc.alturaMeteorit1;
 		llargadaMinimapa = 2;
 		alturaMinimapa=2;
 		vida=1;
