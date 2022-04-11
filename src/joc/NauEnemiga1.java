@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 public class NauEnemiga1 extends Enemic {
 	BufferedImage nauEnemiga1;
+	static float llargadaRelativa = (float)50./1440, alturaRelativa = (float)50./900; //mides relatives a la mida de la pantalla
 	static int tempsEntreTrets=2; //en segons
 	double tempsUltimTret;
 	public NauEnemiga1(Joc joc){
@@ -13,8 +14,8 @@ public class NauEnemiga1 extends Enemic {
 		this.v=6;
 		this.xoc=0;
 		this.mort=false;
-		llargada=50;
-		altura=50;
+		llargada=joc.llargadaNauEnemiga1;
+		altura=joc.alturaNauEnemiga1;
 		alturaMinimapa = 4;
 		llargadaMinimapa = 4;
 		vida=1;

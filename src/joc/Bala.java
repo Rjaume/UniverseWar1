@@ -4,14 +4,20 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Bala {
-	int x,y,xInicial,yInicial,varX,vBalesNau,vBalesEnemigues=15,llargada=10,amplada=1;
+	int x,y,xInicial,yInicial,varX,vBalesNau,vBalesEnemigues=15;
+	static float llargadaRelativa = (float)10./1440, alturaRelativa = (float)1./900; //mides bales, relatives a la mida de la pantalla
+	static int llargada,altura;
 	boolean xoc,isVisible, calculatXoc; 
 	static int bulletDamage = 10;
 	Joc joc;
 	public Bala(Joc joc){
 		vBalesNau = Math.abs((int) (joc.c.Vx/10+18)); //MASSA! POTSER NO CAL TENIR 2 VARIABLES PER VELOCITAT NSE 
-		xInicial = Nau.x+joc.c.xFisiques+50;
-		yInicial=Nau.y+14+joc.c.yFisiques;
+		xInicial = Nau.x+joc.c.xFisiques+Nau.llargada;
+		yInicial = Nau.y+joc.c.yFisiques+Nau.altura/2;
+		x=xInicial;
+		y=yInicial;
+		llargada = joc.llargadaBales;
+		altura = joc.alturaBales;
 		this.xoc=false; 
 		isVisible=true;
 		this.joc=joc;
@@ -28,11 +34,11 @@ public class Bala {
 	}
 	void pinta(Graphics g) {
 		g.setColor(Color.white);
-		g.drawRect(x,y,llargada,amplada);
+		g.drawRect(x,y,llargada,altura);
 	}
 	void pintaBalaEnemic(Graphics g) {
 		g.setColor(Color.white);
-		g.drawRect(x,y,llargada,amplada);
+		g.drawRect(x,y,llargada,altura);
 	}
 	void moureDreta() {
 		x=xInicial-joc.c.xFisiques+varX;

@@ -1,5 +1,6 @@
 package joc;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
@@ -11,13 +12,17 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class Joc implements KeyListener{
-	BufferedImage menuInicial,menuFinal,fons,enemic1,estrella,fonsRecords,menuControls, imatgesMeteorits[]=new BufferedImage[5], imatgesNau[]=new BufferedImage[3];
-	BufferedImage imatgesNauXoc[] = new BufferedImage[3], foratnegre;
+	BufferedImage menuInicial,menuFinal,fons,enemic1,estrella,fonsRecords,menuControls, imatgesMeteorits[]=new BufferedImage[5];
+	BufferedImage imatgesNauXocOriginal[]= new BufferedImage[3],imatgesNau[]= new BufferedImage[3],imatgesNauXoc[] = new BufferedImage[3], foratnegre;
 	File fitxerRecords;
 	Graphics g;
 	Finestra f;
 	Nau c;
 	Minimap map;
+	int llargadaMeteorit1[]=new int[3];
+	int alturaNau,llargadaNau,alturaBales,llargadaBales,alturaMeteorit1,alturaMeteorit2,llargadaMeteorit2,alturaNauEnemiga1,llargadaNauEnemiga1,llargadaForatNegre,alturaForatNegre,llargadaEstrella,alturaEstrella;//mida objectes
+	int alturaMinimapa,llargadaMinimapa,alturaBarres,llargadaBarres,alturaRecords,llargadaRecords, xMenuRecords, yMenuRecords, xTextFinal, yTextFinal, midaLletraRecords, separacioRecords; //mida elements UI
+	//potser agrupar valors de dalt en vectors ?
 	boolean calculatRecords,apuntatTemps,inici,records,controls;
 	ContadorTemps contadorTemps; //l'usarem per a contar quants segons durem vius. 
 	ContadorBales contadorBales; //l'usarem per a escriure per pantalla les bales que ens queden 
@@ -30,10 +35,11 @@ public class Joc implements KeyListener{
 		this.f=f;
 		this.g=f.g; 
 	}
-	void run() { 
+	void run(){ 
 		Inicialitzacio();
 			while(true) {
-				c.isTargetable = false;
+//				System.out.println(alturaForatNegre);
+//				c.isTargetable = false; //va bé per fer debugging
 				moviments();
 				generacioEnemics();
 				xocs(); 
@@ -48,8 +54,15 @@ public class Joc implements KeyListener{
 				}
 			}
 	}
-	void Inicialitzacio() {
+	void Inicialitzacio(){
 		loadResources(); //obtenim les imatges i fitxers que farem servir 
+		calculaMides(); //calculem mides dels objectes en funció de la mida de la pantalla
+		try {
+			resizeImages(); //canviem la mida de les nostres imatges a la mida adecuada en funció de la mida de la pantalla
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 		c=new Nau(this); //creem la nostra nau.
 		map = new Minimap(this); //creem el minimapa
 		contadorTemps=new ContadorTemps(this,g); //creem un nou contador
@@ -62,85 +75,6 @@ public class Joc implements KeyListener{
 		calculatRecords=false;
 		lastimmobilex = -10000;
 	}
-	void loadResources() {
-		try {
-			fons = ImageIO.read(getClass().getResource("/fons.png"));
-		} catch (IOException e) {
-		}
-		try {
-			menuInicial = ImageIO.read(getClass().getResource("/menuinicial.png"));
-		} catch (IOException e) {
-		}
-		try {
-		    menuFinal = ImageIO.read(getClass().getResource("/menufinal.png"));
-		} catch (IOException e) { 
-		}
-		try {
-			imatgesNau[0] = ImageIO.read(getClass().getResource("/nauespacial1.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNau[1] = ImageIO.read(getClass().getResource("/nauespacial2.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNau[2] = ImageIO.read(getClass().getResource("/nauespacial3.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[0] = ImageIO.read(getClass().getResource("/meteorit1.png")); 
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[1] = ImageIO.read(getClass().getResource("/meteorit2.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[2] = ImageIO.read(getClass().getResource("/meteorit3.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[3] = ImageIO.read(getClass().getResource("/meteorit21.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[4] = ImageIO.read(getClass().getResource("/meteorit22.png"));
-		} catch (IOException e) {
-		}
-		try {
-			enemic1 = ImageIO.read(getClass().getResource("/enemic1.png"));
-		} catch (IOException e) {
-		}
-		try {
-			estrella = ImageIO.read(getClass().getResource("/estrella.png"));
-		} catch (IOException e) {
-		}
-		try {
-			fonsRecords = ImageIO.read(getClass().getResource("/records.png"));
-		} catch (IOException e) {
-		}
-		try {
-			menuControls = ImageIO.read(getClass().getResource("/controls.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNauXoc[0] = ImageIO.read(getClass().getResource("/nauespacial1grey.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNauXoc[1] = ImageIO.read(getClass().getResource("/nauespacial2grey.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNauXoc[2] = ImageIO.read(getClass().getResource("/nauespacial3grey.png"));
-		} catch (IOException e) {
-		}
-		try {
-			foratnegre = ImageIO.read(getClass().getResource("/foratnegre.png"));
-		} catch (IOException e) {
-		}
-		fitxerRecords=new File("records.txt"); //no sé si així funciona quan exportem en un runnable jar
-		}
 	void moviments() { //moviments de la nau, enemics, bales i estrelles i dispars dels enemics
 		
 		c.Fisiques(); //calculem com es mou la nau
@@ -151,13 +85,13 @@ public class Joc implements KeyListener{
 		for(int i=0;i<enemics.size();i++) { //enemics
 			
 			//isVisible
-			if(Math.abs(Nau.x-enemics.get(i).x)>2000 || Math.abs(Nau.y-enemics.get(i).y)>2000) {
+			if(Math.abs(Nau.x-enemics.get(i).x)>f.AMPLADA*2 || Math.abs(Nau.y-enemics.get(i).y)>f.ALTURA*2) {
 				enemics.get(i).isVisible=false;
 			}else {
 				enemics.get(i).isVisible=true;
 			}
 			//isInMinmap
-			if(Math.abs(Nau.x-enemics.get(i).x)<1200 && Math.abs(Nau.y-enemics.get(i).y)<1200) {
+			if(Math.abs(Nau.x-enemics.get(i).x)<f.AMPLADA && Math.abs(Nau.y-enemics.get(i).y)<f.ALTURA+0.5*f.ALTURA) {
 				enemics.get(i).isInMinimap = true;
 			}
 			else {
@@ -195,13 +129,13 @@ public class Joc implements KeyListener{
 		//XOC NAU AMB ENEMICS
 		for(Enemic enemic : enemics) {
 			if (c.isTargetable && !enemic.calculatXoc) { //estem assumint que no podem xocar més d'un cop amb el mateix enemics, això podria canviar més endavant
-				if((Nau.y+30>enemic.y)&&(Nau.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-Nau.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false) { //hem de demanar que el meteorit no hagi estat matat i que no estiguem al menu inicial 
+				if((Nau.y+Nau.altura>enemic.y)&&(Nau.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-Nau.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false) { //hem de demanar que el meteorit no hagi estat matat i que no estiguem al menu inicial 
 					c.vida -= enemic.bodyDamage;
 					c.tempsUltimXoc = (int)System.currentTimeMillis();
 					enemic.calculatXoc = true;
 				}
 			}
-			else{ if(!((Nau.y+30>enemic.y)&&(Nau.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-Nau.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false)){
+			else{ if(!((Nau.y+Nau.altura>enemic.y)&&(Nau.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-Nau.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false)){
 				enemic.calculatXoc = false; //així podem xocar més d'un cop amb el mateix enemic
 			}
 			}
@@ -211,7 +145,7 @@ public class Joc implements KeyListener{
 		for(int i=0;i<enemics.size();i++) {
 			for(int j=0;j<enemics.get(i).bales.size();j++) {
 				if(c.isTargetable && !(enemics.get(i).bales).get(j).calculatXoc){
-					if((Nau.x-enemics.get(i).bales.get(j).x<=10)&&(enemics.get(i).bales.get(j).x-Nau.x<=50)&&(enemics.get(i).bales.get(j).y-Nau.y>=-1)&&(enemics.get(i).bales.get(j).y-Nau.y<=32)&&(enemics.get(i).bales.get(j).xoc==false)&&(c.mort==false)&&(inici==false)) {
+					if((Nau.x-enemics.get(i).bales.get(j).x<=10)&&(enemics.get(i).bales.get(j).x-Nau.x<=50)&&(enemics.get(i).bales.get(j).y-Nau.y>=-1)&&(enemics.get(i).bales.get(j).y-Nau.y<=Nau.altura)&&(enemics.get(i).bales.get(j).xoc==false)&&(c.mort==false)&&(inici==false)) {
 						c.vida -= Bala.bulletDamage; //s'haura de canviar si en algun moment posem diferents tipus de bales
 						c.tempsUltimXoc = (int)System.currentTimeMillis();
 						(enemics.get(i).bales).get(j).calculatXoc = true;
@@ -227,16 +161,16 @@ public class Joc implements KeyListener{
 	}
 	void generacioEnemics() {
 		//ENEMICS MOBILS, ANEM GENERANT
-		if(r.nextInt(30)>nivellDificultat("meteorit",25)) { 
+		if(r.nextInt(30)>nivellDificultat("meteorit",27)) { 
 			enemics.add(new Meteorit1(this));
 		}
-		if(r.nextInt(30)>nivellDificultat("meteoritGran",22)) {
+		if(r.nextInt(30)>nivellDificultat("meteoritGran",24)) {
 			enemics.add(new Meteorit2(this));
 			if(r.nextInt(30)>16) { //donem alguna probabilitat diferent de zero a que ens apareixin meteorits grans esquerdats 
 				enemics.get(enemics.size()-1).xoc=1;
 			}
 		} 
-		if(r.nextInt(100)>nivellDificultat("enemic",98)) {
+		if(r.nextInt(100)>nivellDificultat("enemic",99)) {
 			enemics.add(new NauEnemiga1(this));
 		}
 	
@@ -246,7 +180,7 @@ public class Joc implements KeyListener{
 		}
 		//ENEMICS IMMOBILS, ANEM GENERANT CADA CERTA DISTÀNCIA RECORREGUDA PER LA NAU
 
-		if((c.xFisiques-lastimmobilex)>1000){ //cada 1000 pixels forat negre
+		if((c.xFisiques-lastimmobilex)>400){ //cada 1000 pixels forat negre
 			enemics.add(new ForatNegre(this)); 
 			lastimmobilex = c.xFisiques;
 		}
@@ -388,6 +322,137 @@ public class Joc implements KeyListener{
 		}
 		return i;
 	}
+	void loadResources() {
+		try {
+			fons = ImageIO.read(getClass().getResource("/fons.png"));
+		} catch (IOException e) {
+		}
+		try {
+			menuInicial = ImageIO.read(getClass().getResource("/menuinicial.png"));
+		} catch (IOException e) {
+		}
+		try {
+		    menuFinal = ImageIO.read(getClass().getResource("/menufinal.png"));
+		} catch (IOException e) { 
+		}
+		try {
+			imatgesNau[0] = ImageIO.read(getClass().getResource("/nauespacial1.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesNau[1] = ImageIO.read(getClass().getResource("/nauespacial2.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesNau[2] = ImageIO.read(getClass().getResource("/nauespacial3.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesMeteorits[0] = ImageIO.read(getClass().getResource("/meteorit1.png")); 
+		} catch (IOException e) {
+		}
+		try {
+			imatgesMeteorits[1] = ImageIO.read(getClass().getResource("/meteorit2.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesMeteorits[2] = ImageIO.read(getClass().getResource("/meteorit3.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesMeteorits[3] = ImageIO.read(getClass().getResource("/meteorit21.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesMeteorits[4] = ImageIO.read(getClass().getResource("/meteorit22.png"));
+		} catch (IOException e) {
+		}
+		try {
+			enemic1 = ImageIO.read(getClass().getResource("/enemic1.png"));
+		} catch (IOException e) {
+		}
+		try {
+			estrella = ImageIO.read(getClass().getResource("/estrella.png"));
+		} catch (IOException e) {
+		}
+		try {
+			fonsRecords = ImageIO.read(getClass().getResource("/records.png"));
+		} catch (IOException e) {
+		}
+		try {
+			menuControls = ImageIO.read(getClass().getResource("/controls.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesNauXoc[0] = ImageIO.read(getClass().getResource("/nauespacial1grey.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesNauXoc[1] = ImageIO.read(getClass().getResource("/nauespacial2grey.png"));
+		} catch (IOException e) {
+		}
+		try {
+			imatgesNauXoc[2] = ImageIO.read(getClass().getResource("/nauespacial3grey.png"));
+		} catch (IOException e) {
+		}
+		try {
+			foratnegre = ImageIO.read(getClass().getResource("/foratnegre.png"));
+		} catch (IOException e) {
+		}
+		fitxerRecords=new File("records.txt"); //no troba el fitxer quan exportem en runnable jar
+		}
+	BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH); //hi ha altres algorismes 
+	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB); //type_int_argb respecta la transperència
+	    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+	    return outputImage;
+	}
+	void calculaMides() { //calcula mides dels objectes en funció de la mida de la pantalla
+		llargadaNau = Math.round(Nau.llargadaRelativa * f.AMPLADA);
+		alturaNau = Math.round(Nau.alturaRelativa * f.ALTURA);
+		llargadaBales = Math.round(Bala.llargadaRelativa*f.AMPLADA);
+		alturaBales = Math.round(Bala.alturaRelativa*f.ALTURA);
+		llargadaMeteorit1[0] = Math.round(Meteorit1.llargadaRelativa[0]*f.AMPLADA); //meteorit petit amb molt foc
+		llargadaMeteorit1[1] = Math.round(Meteorit1.llargadaRelativa[1]*f.AMPLADA); //meteorit petit amb una mica de foc
+		llargadaMeteorit1[2] = Math.round(Meteorit1.llargadaRelativa[2]*f.AMPLADA); //meteorit petit sense foc
+		alturaMeteorit1 = Math.round(Meteorit1.alturaRelativa*f.ALTURA);
+		llargadaMeteorit2 = Math.round(Meteorit2.llargadaRelativa*f.AMPLADA);
+		alturaMeteorit2 = Math.round(Meteorit2.alturaRelativa*f.ALTURA);
+		llargadaNauEnemiga1 = Math.round(NauEnemiga1.llargadaRelativa*f.AMPLADA);
+		alturaNauEnemiga1 = Math.round(NauEnemiga1.alturaRelativa*f.ALTURA);
+		llargadaForatNegre = Math.round(ForatNegre.llargadaRelativa*f.AMPLADA);
+		alturaForatNegre = Math.round(ForatNegre.alturaRelativa*f.ALTURA);
+		llargadaMinimapa = Math.round(Minimap.llargadaRelativa*f.AMPLADA);
+		alturaMinimapa = Math.round(Minimap.alturaRelativa*f.ALTURA);
+		llargadaBarres = Math.round(ContadorBales.llargadaRelativa*f.AMPLADA);
+		alturaBarres = Math.round(ContadorBales.alturaRelativa*f.ALTURA);
+		llargadaEstrella = Math.round(Estrella.llargadaRelativa*f.AMPLADA);
+		alturaEstrella = Math.round(Estrella.alturaRelativa*f.ALTURA);
+		xMenuRecords = Math.round(ContadorTemps.xRelativa1*f.AMPLADA);
+		yMenuRecords = Math.round(ContadorTemps.yRelativa1*f.ALTURA);
+		xTextFinal = Math.round(ContadorTemps.xRelativa2*f.AMPLADA);
+		yTextFinal = Math.round(ContadorTemps.yRelativa2*f.ALTURA);
+		midaLletraRecords = Math.round(ContadorTemps.midaTextRelativa*f.AMPLADA);
+		separacioRecords = Math.round(ContadorTemps.separacioRelativa*f.ALTURA);
+	}
+	void resizeImages()throws IOException{
+		for(int i=0; i<3;i++) { 
+			imatgesNau[i]=resizeImage(imatgesNau[i],llargadaNau,alturaNau);
+			imatgesNauXoc[i]=resizeImage(imatgesNauXoc[i],llargadaNau,alturaNau);
+		} 
+		for(int i=0;i<3;i++) {
+			imatgesMeteorits[i] = resizeImage(imatgesMeteorits[i],llargadaMeteorit1[i],alturaMeteorit1);
+		}
+		imatgesMeteorits[3] = resizeImage(imatgesMeteorits[3],llargadaMeteorit2,alturaMeteorit2);
+		imatgesMeteorits[4] = resizeImage(imatgesMeteorits[4],llargadaMeteorit2,alturaMeteorit2);
+		enemic1 = resizeImage(enemic1,llargadaNauEnemiga1,alturaNauEnemiga1);
+		foratnegre = resizeImage(foratnegre,llargadaForatNegre,alturaForatNegre );
+		fons=resizeImage(fons,f.AMPLADA,f.ALTURA);
+		menuInicial=resizeImage(menuInicial,f.AMPLADA,f.ALTURA);
+		menuFinal=resizeImage(menuFinal,f.AMPLADA,f.ALTURA);
+		menuControls=resizeImage(menuControls,f.AMPLADA,f.ALTURA);
+		fonsRecords=resizeImage(fonsRecords,f.AMPLADA,f.ALTURA);
+	}
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
@@ -414,6 +479,9 @@ public class Joc implements KeyListener{
 		}
 		if(e.getKeyCode()==66 && controls ) {
 			controls=false;
+		}
+		if(e.getKeyCode()==27) {
+			Finestra.device.setFullScreenWindow(null);
 		}
 	}
 	@Override

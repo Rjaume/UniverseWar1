@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 public class Meteorit2 extends Enemic{
 	BufferedImage meteorit,meteoritEsquerdat;
+	static float llargadaRelativa = (float)90./1440, alturaRelativa = (float)90./900; //mides relatives a la mida de la pantalla
 	public Meteorit2(Joc joc) {
 		super(joc);
 		this.bodyDamage = 50;
@@ -13,8 +14,8 @@ public class Meteorit2 extends Enemic{
 		this.mort=false;
 		meteorit=joc.imatgesMeteorits[3];
 		meteoritEsquerdat=joc.imatgesMeteorits[4];
-		llargada=90;
-		altura=90;
+		llargada=joc.llargadaMeteorit2;
+		altura=joc.alturaMeteorit2;
 		vida=2;
 		alturaMinimapa = 6;
 		llargadaMinimapa = 6;
