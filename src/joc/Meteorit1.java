@@ -28,8 +28,8 @@ public class Meteorit1 extends Enemic {
 			llargada[i] = joc.llargadaMeteorit1[i];
 		}
 		altura=joc.alturaMeteorit1;
-		llargadaMinimapa = 2;
-		alturaMinimapa=2;
+		alturaMinimapa = joc.llargadaMeteorit1M;
+		llargadaMinimapa = joc.llargadaMeteorit1M;
 		vida=1;
 	}
 	void pinta(Graphics g) {

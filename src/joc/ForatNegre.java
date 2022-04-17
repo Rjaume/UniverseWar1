@@ -16,8 +16,8 @@ public class ForatNegre extends Enemic{
 		isNegligible = false;
 		llargada = joc.llargadaForatNegre;
 		altura = joc.alturaForatNegre;
-		llargadaMinimapa = 2;
-		alturaMinimapa = 2;
+		llargadaMinimapa = joc.llargadaForatNegreM;
+		alturaMinimapa = joc.llargadaForatNegreM;
 	}
 	
 	@Override
@@ -31,7 +31,7 @@ public class ForatNegre extends Enemic{
 	void moure() { //Els forats negres no es mouen 	
 		x=xInicial-joc.c.xFisiques;
 		y=yInicial-joc.c.yFisiques;
-		if(Math.abs(x-Nau.x)>maxDistanceOfAtraction || Math.abs(y-Nau.y)>maxDistanceOfAtraction) { 
+		if(Math.abs(x-joc.c.x)>maxDistanceOfAtraction || Math.abs(y-joc.c.y)>maxDistanceOfAtraction) { 
 			this.isNegligible = true; //si la nau està massa lluny del forat negre aquest deixa de xuclar
 		}else {
 			this.isNegligible = false;

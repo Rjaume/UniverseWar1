@@ -3,24 +3,22 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
 public class Finestra extends JFrame{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Joc j;
-	//static int AMPLADA=1200,ALTURA=800;
 	int AMPLADA, ALTURA; //current size of the game screen 
 	Image im; //tècnica doble buffer
 	Graphics g;
 	JLabel label1;
 	static GraphicsDevice device = GraphicsEnvironment
-	        .getLocalGraphicsEnvironment().getScreenDevices()[0]; // canviant el zero escullo la pantalla on jugo
+	        .getLocalGraphicsEnvironment().getScreenDevices()[0]; // canviant el zero s'escull la pantalla on es juga en cas de tenir més d'una pantalla
 	public static void main(String[] args) {
 		new Finestra();
 	}

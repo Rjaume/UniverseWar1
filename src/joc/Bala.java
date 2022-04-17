@@ -11,9 +11,9 @@ public class Bala {
 	static int bulletDamage = 10;
 	Joc joc;
 	public Bala(Joc joc){
-		vBalesNau = Math.abs((int) (joc.c.Vx/10+18)); //MASSA! POTSER NO CAL TENIR 2 VARIABLES PER VELOCITAT NSE 
-		xInicial = Nau.x+joc.c.xFisiques+Nau.llargada;
-		yInicial = Nau.y+joc.c.yFisiques+Nau.altura/2;
+		vBalesNau = Math.abs((int) (joc.c.Vx/10+18)); //tenim una mica en compte la velocitat de la nau per a decidir si la bala anirà més rapid o més lenta
+		xInicial = joc.c.x+joc.c.xFisiques+joc.c.llargada;
+		yInicial = joc.c.y+joc.c.yFisiques+joc.c.altura/2;
 		x=xInicial;
 		y=yInicial;
 		llargada = joc.llargadaBales;
@@ -40,12 +40,12 @@ public class Bala {
 		g.setColor(Color.white);
 		g.drawRect(x,y,llargada,altura);
 	}
-	void moureDreta() {
+	void moureDreta() { //la nau dispara cap a la dreta
 		x=xInicial-joc.c.xFisiques+varX;
 		y=yInicial-joc.c.yFisiques;
 		varX+=vBalesNau;
 	}
-	void moureEsquerra() {
+	void moureEsquerra() { //els enemics disparen cap a l'esquerra
 		if(isVisible) {
 			x=xInicial-joc.c.xFisiques+varX;
 			y=yInicial-joc.c.yFisiques;
