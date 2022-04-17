@@ -31,7 +31,7 @@ public class ContadorBales {
 		g.setColor(Color.cyan);
 		for(int i=0;i<balesRestants;i++) {
 			g.fillRect(xBarra+i*2*llargadaRectangle,yBarra,llargadaRectangle,alturaRectangle); //posició relativa a la mida de les barres. No volem xocar amb la
-			//barra de dalt ni menjar-nos el text de l'esquerra.
+			//barra de dalt ni tocar amb el text de l'esquerra.
 		}
 		g.drawRect(xBarra,yBarra,2*Nau.balesInicials*llargadaRectangle,alturaRectangle); 
 		

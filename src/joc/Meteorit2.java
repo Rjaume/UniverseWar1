@@ -17,8 +17,8 @@ public class Meteorit2 extends Enemic{
 		llargada=joc.llargadaMeteorit2;
 		altura=joc.alturaMeteorit2;
 		vida=2;
-		alturaMinimapa = 6;
-		llargadaMinimapa = 6;
+		alturaMinimapa = joc.llargadaMeteorit2M;
+		llargadaMinimapa = joc.llargadaMeteorit2M;
 		balesInicials=0; //els meteorits no tenen bales
 	}
 	

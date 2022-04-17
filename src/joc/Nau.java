@@ -7,19 +7,16 @@ import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Nau implements KeyListener {
+public class Nau extends Objecte implements KeyListener{
 	static int balesInicials=50;
 	Bala bales[];
 	int nbales; //conta el nombre de bales que queden a la nau. 
 	int n; //l'usem per a l'animació 
 	static float llargadaRelativa = (float)50./1440, alturaRelativa = (float)32./900;//mides de la nau, relatives a la mida de la pantalla. Son els quocients llargada/(amplada pantalla) i altura/(altura pantalla))
-	static int llargada,altura;
 	static int xBarraVida, yBarraVida=40, llargadaRectangleVida, alturaRectangleVida;  //fixem la posició de la barra de Vida que determina la de la barra de bales
-	static int llargadaMinimapa = 2, alturaMinimapa = 2;
 	int tempsUltimXoc;
-	static int x,y; //posició on pintem la nau (el centre de la finestra).
-	static int vidaMaxima = 100; //vida maxima de la nau, cada xoc ens traurà un nombre determinat de vida 
-	int vida;
+	static int vidaMaxima = 100; //vida maxima de la nau, cada xoc ens restarà un nombre determinat de vida 
+	int vida; //vida actual de la nau 
 	static int xVida = 10, yVida = 10; //posició de la barra de vida 
 	boolean mort,fletxaDreta,fletxaEsquerra,fletxaAmunt,fletxaAvall,isTargetable;
 	Joc joc;
@@ -32,13 +29,13 @@ public class Nau implements KeyListener {
 	
 	Nau(Joc joc){
 		this.joc=joc;
-		x=joc.f.AMPLADA/2-llargada/2;
+		x=joc.f.AMPLADA/2-llargada/2; //pintem la nau sempre al centre de la finestra
 		y=joc.f.ALTURA/2-altura/2;
 		llargada = joc.llargadaNau;
 		altura = joc.alturaNau;
 		llargadaRectangleVida = joc.llargadaBarres;
 		alturaRectangleVida = joc.alturaBarres;
-		xBarraVida = Math.round(ContadorBales.xBarraRelativa*llargadaRectangleVida); //no pot ser que la barra ens xoqui amb el text
+		xBarraVida = Math.round(ContadorBales.xBarraRelativa*llargadaRectangleVida); 
 		xFisiques=0;
 		yFisiques=0;
 		n=0;
@@ -169,7 +166,7 @@ public class Nau implements KeyListener {
 		
 		//Equacions del moviment uniformement accelerat.
 		
-		float FX = Fx-Ffx+FxG; //forces resultants sobre la nau 
+		float FX = Fx-Ffx+FxG; //forces resultants sobre la nau, degudes als motors de la nau i als forats negres
 		float FY = Fy-Ffy+FyG;
 		Vx+=((FX)/Nau.M)*Joc.dt; 
 		xFisiques+=Vx*Joc.dt+0.5*((FX)/Nau.M)*(Joc.dt)*(Joc.dt);

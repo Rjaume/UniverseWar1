@@ -22,15 +22,18 @@ public class Joc implements KeyListener{
 	int llargadaMeteorit1[]=new int[3];
 	int alturaNau,llargadaNau,alturaBales,llargadaBales,alturaMeteorit1,alturaMeteorit2,llargadaMeteorit2,alturaNauEnemiga1,llargadaNauEnemiga1,llargadaForatNegre,alturaForatNegre,llargadaEstrella,alturaEstrella;//mida objectes
 	int alturaMinimapa,llargadaMinimapa,alturaBarres,llargadaBarres,alturaRecords,llargadaRecords, xMenuRecords, yMenuRecords, xTextFinal, yTextFinal, midaLletraRecords, separacioRecords; //mida elements UI
-	//potser agrupar valors de dalt en vectors ?
+	int alturaNauM,llargadaNauM,llargadaMeteorit1M, llargadaMeteorit2M,alturaNauEnemiga1M, llargadaNauEnemiga1M, llargadaCheckpointM, alturaCheckpointM,llargadaForatNegreM,midaPuntRadar; //mida elements minimapa
+	//potser agrupar valors de dalt en vectors
 	boolean calculatRecords,apuntatTemps,inici,records,controls;
 	ContadorTemps contadorTemps; //l'usarem per a contar quants segons durem vius. 
 	ContadorBales contadorBales; //l'usarem per a escriure per pantalla les bales que ens queden 
 	ArrayList<Estrella> estrelles =new ArrayList<Estrella>();
 	ArrayList<Enemic> enemics = new ArrayList<Enemic>();
+	ArrayList<Checkpoint> checkpoints = new ArrayList<Checkpoint>();
 	static Random r = new Random(); //element random que usarem al llarg del codi per a aconseguir valors aleatoris.
 	static double dt=0.1; //l'usem per a les físiques de la nau
 	int lastimmobilex; //x de l'últim enemic immobil generat
+	//provem el radar
 	Joc(Finestra f){
 		this.f=f;
 		this.g=f.g; 
@@ -38,15 +41,15 @@ public class Joc implements KeyListener{
 	void run(){ 
 		Inicialitzacio();
 			while(true) {
-//				System.out.println(alturaForatNegre);
-//				c.isTargetable = false; //va bé per fer debugging
+//				System.out.println(alturaMinimapa);
+				c.isTargetable = false; //va bé per fer debugging
 				moviments();
 				generacioEnemics();
 				xocs(); 
 				repintar();
 				contadorTemps.apuntaTemps();
 				contadorTemps.llegeixTemps();
-				f.repaint(); //crida update
+				f.repaint(); 
 				try {
 					Thread.sleep(20); //potser s'ha de variar en funció del processador
 				} catch (InterruptedException e) {
@@ -74,6 +77,7 @@ public class Joc implements KeyListener{
 		records=false;
 		calculatRecords=false;
 		lastimmobilex = -10000;
+		generacioMapa();
 	}
 	void moviments() { //moviments de la nau, enemics, bales i estrelles i dispars dels enemics
 		
@@ -81,24 +85,25 @@ public class Joc implements KeyListener{
 		
 		for(int i=0;i<c.nbales;i++) //bales nau
 			c.bales[i].moureDreta();
-		
 		for(int i=0;i<enemics.size();i++) { //enemics
 			
 			//isVisible
-			if(Math.abs(Nau.x-enemics.get(i).x)>f.AMPLADA*2 || Math.abs(Nau.y-enemics.get(i).y)>f.ALTURA*2) {
+			if(Math.abs(c.x-enemics.get(i).x)>f.AMPLADA*2 || Math.abs(c.y-enemics.get(i).y)>f.ALTURA*2) {
 				enemics.get(i).isVisible=false;
 			}else {
 				enemics.get(i).isVisible=true;
 			}
 			//isInMinmap
-			if(Math.abs(Nau.x-enemics.get(i).x)<f.AMPLADA && Math.abs(Nau.y-enemics.get(i).y)<f.ALTURA+0.5*f.ALTURA) {
+			if(Math.abs(c.x-enemics.get(i).x)<f.AMPLADA && Math.abs(c.y-enemics.get(i).y)<f.ALTURA+0.5*f.ALTURA) {
 				enemics.get(i).isInMinimap = true;
 			}
 			else {
 				enemics.get(i).isInMinimap = false;
 			}
-		
+			//movem
 			enemics.get(i).moure();
+			
+			//disparem
 			if(enemics.get(i) instanceof NauEnemiga1) {
 				for(int j=0;j<(enemics.get(i)).bales.size();j++) {
 					((enemics.get(i)).bales.get(j)).moureEsquerra();
@@ -111,6 +116,27 @@ public class Joc implements KeyListener{
 		
 		for(int i=0;i<estrelles.size();i++) {//estrelles de fons
 			estrelles.get(i).moure();
+		}
+		for(int i=0;i<checkpoints.size();i++) {//checkpoints
+			
+			//isVisible
+			if(Math.abs(c.x-checkpoints.get(i).x)>f.AMPLADA*2 || Math.abs(c.y-checkpoints.get(i).y)>f.ALTURA*2) {
+				checkpoints.get(i).isVisible=false;
+			}else {
+				checkpoints.get(i).isVisible=true;
+			}
+			
+			//isInMinimap
+			if(Math.abs(c.x-checkpoints.get(i).x)<f.AMPLADA && Math.abs(c.y-checkpoints.get(i).y)<f.ALTURA+0.5*f.ALTURA) {
+				checkpoints.get(i).isInMinimap = true;
+			}
+			else {
+				checkpoints.get(i).isInMinimap = false;
+			}
+			
+			//movem
+			checkpoints.get(i).moure();
+			
 		}
 	}
 	void xocs() {		
@@ -128,14 +154,14 @@ public class Joc implements KeyListener{
 		}
 		//XOC NAU AMB ENEMICS
 		for(Enemic enemic : enemics) {
-			if (c.isTargetable && !enemic.calculatXoc) { //estem assumint que no podem xocar més d'un cop amb el mateix enemics, això podria canviar més endavant
-				if((Nau.y+Nau.altura>enemic.y)&&(Nau.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-Nau.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false) { //hem de demanar que el meteorit no hagi estat matat i que no estiguem al menu inicial 
+			if (c.isTargetable && !enemic.calculatXoc) { 
+				if((c.y+c.altura>enemic.y)&&(c.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-c.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false) { //hem de demanar que el meteorit no hagi estat matat i que no estiguem al menu inicial 
 					c.vida -= enemic.bodyDamage;
 					c.tempsUltimXoc = (int)System.currentTimeMillis();
 					enemic.calculatXoc = true;
 				}
 			}
-			else{ if(!((Nau.y+Nau.altura>enemic.y)&&(Nau.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-Nau.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false)){
+			else{ if(!((c.y+c.altura>enemic.y)&&(c.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-c.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false)){
 				enemic.calculatXoc = false; //així podem xocar més d'un cop amb el mateix enemic
 			}
 			}
@@ -145,7 +171,7 @@ public class Joc implements KeyListener{
 		for(int i=0;i<enemics.size();i++) {
 			for(int j=0;j<enemics.get(i).bales.size();j++) {
 				if(c.isTargetable && !(enemics.get(i).bales).get(j).calculatXoc){
-					if((Nau.x-enemics.get(i).bales.get(j).x<=10)&&(enemics.get(i).bales.get(j).x-Nau.x<=50)&&(enemics.get(i).bales.get(j).y-Nau.y>=-1)&&(enemics.get(i).bales.get(j).y-Nau.y<=Nau.altura)&&(enemics.get(i).bales.get(j).xoc==false)&&(c.mort==false)&&(inici==false)) {
+					if((c.x-enemics.get(i).bales.get(j).x<=10)&&(enemics.get(i).bales.get(j).x-c.x<=50)&&(enemics.get(i).bales.get(j).y-c.y>=-1)&&(enemics.get(i).bales.get(j).y-c.y<=c.altura)&&(enemics.get(i).bales.get(j).xoc==false)&&(c.mort==false)&&(inici==false)) {
 						c.vida -= Bala.bulletDamage; //s'haura de canviar si en algun moment posem diferents tipus de bales
 						c.tempsUltimXoc = (int)System.currentTimeMillis();
 						(enemics.get(i).bales).get(j).calculatXoc = true;
@@ -153,6 +179,8 @@ public class Joc implements KeyListener{
 				}
 			}
 		}
+		
+		//AQUI HI HAURIA D'HAVER XOCS AMB CHECKPOINTS QUE FARIEN SORTIR UN MENÚ ON FER MILLORES A LA NAU/ALTRES.
 		
 		//MIREM SI S'HA MORT LA NAU
 		if(c.vida <= 0) {
@@ -180,7 +208,7 @@ public class Joc implements KeyListener{
 		}
 		//ENEMICS IMMOBILS, ANEM GENERANT CADA CERTA DISTÀNCIA RECORREGUDA PER LA NAU
 
-		if((c.xFisiques-lastimmobilex)>400){ //cada 1000 pixels forat negre
+		if((c.xFisiques-lastimmobilex)>400){ //cada 400 pixels forat negre
 			enemics.add(new ForatNegre(this)); 
 			lastimmobilex = c.xFisiques;
 		}
@@ -196,6 +224,9 @@ public class Joc implements KeyListener{
 		calculatRecords=false;
 		contadorBales.balesRestants=Nau.balesInicials;
 		lastimmobilex = -10000;
+		ArrayList<Checkpoint> l = new ArrayList<Checkpoint>();
+		this.checkpoints = l;
+		generacioMapa();
 	}
 	void repintar() {
 		g.drawImage(fons,0,0,null);
@@ -208,7 +239,7 @@ public class Joc implements KeyListener{
 			}
 			//DIBUIXEM BALES
 			for(int i=0;i<c.nbales;i++){
-				if(c.bales[i].xoc==false && c.mort==false && c.bales[i].isVisible) { //si les bales no han xocat i la nau esta viva les pi)ntem. 
+				if(c.bales[i].xoc==false && c.mort==false && c.bales[i].isVisible) { //si les bales no han xocat i la nau esta viva les pintem. 
 				c.bales[i].pinta(g);
 				}
 			}
@@ -225,6 +256,13 @@ public class Joc implements KeyListener{
 					enemics.get(i).pinta(g);
 				}
 			}
+			//DIBUIXEM CHECKPOINTS
+			for(int i=0;i<checkpoints.size();i++) {
+				if(checkpoints.get(i).isVisible) {
+					checkpoints.get(i).pinta();
+				}
+			}
+			
 			if(!c.mort) {
 				//DIBUIXEM NAU BARRA VIDA I BARRA MUNICIÓ
 				int dtemps = Math.abs(c.tempsUltimXoc-(int)System.currentTimeMillis()); //aqui regulem com ens avisa la nau que ha xocat amb un objecte
@@ -401,15 +439,15 @@ public class Joc implements KeyListener{
 		}
 		fitxerRecords=new File("records.txt"); //no troba el fitxer quan exportem en runnable jar
 		}
-	BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+	BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException { //funció que ens canvia la mida d'una imatge donada
 	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH); //hi ha altres algorismes 
 	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB); //type_int_argb respecta la transperència
 	    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
 	    return outputImage;
 	}
 	void calculaMides() { //calcula mides dels objectes en funció de la mida de la pantalla
-		llargadaNau = Math.round(Nau.llargadaRelativa * f.AMPLADA);
-		alturaNau = Math.round(Nau.alturaRelativa * f.ALTURA);
+		llargadaNau = Math.round(c.llargadaRelativa * f.AMPLADA);
+		alturaNau = Math.round(c.alturaRelativa * f.ALTURA);
 		llargadaBales = Math.round(Bala.llargadaRelativa*f.AMPLADA);
 		alturaBales = Math.round(Bala.alturaRelativa*f.ALTURA);
 		llargadaMeteorit1[0] = Math.round(Meteorit1.llargadaRelativa[0]*f.AMPLADA); //meteorit petit amb molt foc
@@ -434,8 +472,16 @@ public class Joc implements KeyListener{
 		yTextFinal = Math.round(ContadorTemps.yRelativa2*f.ALTURA);
 		midaLletraRecords = Math.round(ContadorTemps.midaTextRelativa*f.AMPLADA);
 		separacioRecords = Math.round(ContadorTemps.separacioRelativa*f.ALTURA);
+		midaPuntRadar = Math.round(Minimap.midaPuntRadarRelativa*f.AMPLADA); //calculem mida objectes radar
+		llargadaNauM = Math.round(Minimap.llargadaNauRelativa*f.AMPLADA);
+		alturaNauM = Math.round(Minimap.alturaNauRelativa*f.ALTURA);
+		llargadaMeteorit1M = Math.round(Minimap.llargadaMeteorit1Relativa*f.AMPLADA);
+		llargadaMeteorit2M = Math.round(Minimap.llargadaMeteorit2Relativa*f.AMPLADA);
+		llargadaCheckpointM = Math.round(Minimap.llargadaCheckpointRelativa*f.AMPLADA);
+		alturaCheckpointM = Math.round(Minimap.alturaCheckpointRelativa*f.ALTURA);
+		llargadaForatNegreM = Math.round(Minimap.llargadaForatNegreRelativa*f.AMPLADA);
 	}
-	void resizeImages()throws IOException{
+	void resizeImages()throws IOException{ // canviem la mida de les imatges usant les mides calculades anteriorment
 		for(int i=0; i<3;i++) { 
 			imatgesNau[i]=resizeImage(imatgesNau[i],llargadaNau,alturaNau);
 			imatgesNauXoc[i]=resizeImage(imatgesNauXoc[i],llargadaNau,alturaNau);
@@ -452,6 +498,18 @@ public class Joc implements KeyListener{
 		menuFinal=resizeImage(menuFinal,f.AMPLADA,f.ALTURA);
 		menuControls=resizeImage(menuControls,f.AMPLADA,f.ALTURA);
 		fonsRecords=resizeImage(fonsRecords,f.AMPLADA,f.ALTURA);
+	}
+	public void generacioMapa() {//ELEMENTS FIXOS DEL MAPA: CHECKPOINTS, "ENEMICS INTEL·LIGENTS"(npcs), BASES ENEMIGUES
+		
+		//checkpoints
+		Checkpoint checkpoint1 = new Checkpoint(this,100,100);
+		Checkpoint checkpoint2 = new Checkpoint(this, 1500,4000);
+		Checkpoint checkpoint3 = new Checkpoint(this, 10000,-100);
+		checkpoints.add(checkpoint1);
+		checkpoints.add(checkpoint2);
+		checkpoints.add(checkpoint3);
+		
+		//npcs enemics
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {

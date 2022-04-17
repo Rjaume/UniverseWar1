@@ -4,14 +4,13 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-public class Estrella {
+public class Estrella extends Objecte{
 	BufferedImage imatge;
-	int xInicial,yInicial,x,y,varX,v;
+	int xInicial,yInicial,varX,v;
 	static float llargadaRelativa = (float)1./1440, alturaRelativa = (float)1./900; //mides relatives a la mida de la pantalla
-	int llargada,altura;
 	Joc joc;
 	static int maxGeneracio;
-	double temps; // ens permetra saber quant temps porta existint l'estrella per a 
+	double temps; // ens permetrà saber quant temps porta existint l'estrella per a 
 	//no dibuixar-la al cap d'un temps 
 	boolean isVisible; 
 	public Estrella(Joc joc) {
