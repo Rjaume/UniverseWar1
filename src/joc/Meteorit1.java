@@ -7,8 +7,6 @@ public class Meteorit1 extends Enemic {
 	BufferedImage Imatge;//
 	static float llargadaRelativa[] = new float[] {(float)78./1440, (float)78./1440,(float)34./1440 };
 	static float alturaRelativa = (float)34./900; //mides relatives a la mida de la pantalla
-	int llargada[] = new int[3]; //llargada depen de si tenim més foc o menys
-	//número que es restarà a la vida de la nau cada cop que xoquem amb aquest tipus de meteorit
 	public Meteorit1(Joc joc){
 		super(joc);
 		this.bodyDamage = 25;
@@ -24,10 +22,8 @@ public class Meteorit1 extends Enemic {
 		if(this.v>16) {
 			this.Imatge=joc.imatgesMeteorits[0];
 		}
-		for(int i=0;i<3;i++) {
-			llargada[i] = joc.llargadaMeteorit1[i];
-		}
 		altura=joc.alturaMeteorit1;
+		llargada=altura; //a efectes dels xocs l'altura és la mateixa que la llargada.
 		alturaMinimapa = joc.llargadaMeteorit1M;
 		llargadaMinimapa = joc.llargadaMeteorit1M;
 		vida=1;

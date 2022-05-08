@@ -2,26 +2,45 @@ package joc;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 public class Bala {
-	int x,y,xInicial,yInicial,varX,vBalesNau,vBalesEnemigues=15;
+	int xPinta,yPinta,dfx,dfy,x,y,xInicial,yInicial,vBalesNau,vBalesEnemigues=15; 
+	float vxBalaInicial,vyBalaInicial; //velocitats x i y de la nau en el moment de disparar
+	//(xPinta,yPinta) és la posició de la imatge de la bala i (x,y) és la posició de la bala. dfx i dfy son les diferencies de posició en ambdues (al rotar posem la bala dins una imatge més gran del que toca)
+	float varX,varY;
 	static float llargadaRelativa = (float)10./1440, alturaRelativa = (float)1./900; //mides bales, relatives a la mida de la pantalla
-	static int llargada,altura;
+	static int llargada,altura,diagonal;
 	boolean xoc,isVisible, calculatXoc; 
 	static int bulletDamage = 10;
+	static BufferedImage imatgeBala;
+	double angleDispar; //valor angle de la nau quan hem disparat
 	Joc joc;
-	public Bala(Joc joc){
-		vBalesNau = Math.abs((int) (joc.c.Vx/10+18)); //tenim una mica en compte la velocitat de la nau per a decidir si la bala anirà més rapid o més lenta
-		xInicial = joc.c.x+joc.c.xFisiques+joc.c.llargada;
-		yInicial = joc.c.y+joc.c.yFisiques+joc.c.altura/2;
-		x=xInicial;
-		y=yInicial;
+	public Bala(Joc joc){ //constructor per la nau
+		this.joc=joc;
+		vxBalaInicial = joc.c.Vx;
+		vyBalaInicial = joc.c.Vy;
+		vBalesNau = 300;//200
+		imatgeBala = joc.bala;
+		llargada = joc.llargadaBala;
+		altura = joc.alturaBala;
+		diagonal = Math.round((float)(Math.sqrt(llargada*llargada+altura*altura)));
+		angleDispar = joc.c.alpha;
+		imatgeBala = Nau.rota(imatgeBala,angleDispar);
+		dfx = Math.round((float)(diagonal/2-diagonal/2*Math.cos(angleDispar))); //diferència entre les posicions de la imatge de la bala i la bala en si
+		dfy = Math.round((float)(diagonal/2-diagonal/2*Math.sin(angleDispar)));
+		xInicial = Math.round((float)(joc.c.xPinta+joc.c.xFisiques+Nau.diagonal/2+(joc.c.llargada/2)*Math.cos(angleDispar)))-dfx; //posició on hem de pintar la imatge de la bala
+		yInicial = Math.round((float)(joc.c.yPinta+joc.c.yFisiques+Nau.diagonal/2+(joc.c.llargada/2)*Math.sin(angleDispar)))-dfy;
+		x = xInicial+dfx; //posició on realment és la bala, tinguent en compte que la imatge té mida més gran
+		y = yInicial+dfy;
+		xPinta=xInicial;
+		yPinta=yInicial;
 		llargada = joc.llargadaBales;
 		altura = joc.alturaBales;
 		this.xoc=false; 
 		isVisible=true;
-		this.joc=joc;
 		varX=0;
+		varY=0;
 	}
 	public Bala(Enemic e,Joc joc){
 		calculatXoc = false;
@@ -34,23 +53,26 @@ public class Bala {
 	}
 	void pinta(Graphics g) {
 		g.setColor(Color.white);
-		g.drawRect(x,y,llargada,altura);
+		g.drawImage(imatgeBala,xPinta,yPinta,null);
 	}
 	void pintaBalaEnemic(Graphics g) {
 		g.setColor(Color.white);
-		g.drawRect(x,y,llargada,altura);
+		g.drawRect(xPinta,yPinta,llargada,altura);
 	}
-	void moureDreta() { //la nau dispara cap a la dreta
-		x=xInicial-joc.c.xFisiques+varX;
-		y=yInicial-joc.c.yFisiques;
-		varX+=vBalesNau;
+	void moureBalaNau() { //
+		xPinta=Math.round(xInicial-joc.c.xFisiques+varX);
+		yPinta=Math.round(yInicial-joc.c.yFisiques+varY);
+		x = xPinta+dfx;
+		y = yPinta+dfy;
+		varX+=vxBalaInicial*Joc.dt+vBalesNau*Math.cos(angleDispar)*Joc.dt;
+		varY+=vyBalaInicial*Joc.dt+vBalesNau*Math.sin(angleDispar)*Joc.dt;
 	}
 	void moureEsquerra() { //els enemics disparen cap a l'esquerra
 		if(isVisible) {
-			x=xInicial-joc.c.xFisiques+varX;
-			y=yInicial-joc.c.yFisiques;
+			xPinta=Math.round(xInicial-joc.c.xFisiques+varX);
+			yPinta=yInicial-joc.c.yFisiques;
 			varX-=vBalesEnemigues;
-				if(x<-100) {
+				if(Math.abs(xPinta-joc.c.x)>1000) {
 					isVisible=false;
 				}
 			}

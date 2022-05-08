@@ -13,8 +13,8 @@ public class Checkpoint extends Objecte{
 		this.g=joc.g;
 		this.x = x;
 		this.y = y;
-		llargada = 100;
-		altura = 100;
+		llargada = 1000;
+		altura = 1000;
 		llargadaMinimapa = joc.llargadaCheckpointM; //s'ha de calcular, he posat això per fer proves
 		alturaMinimapa = joc.alturaCheckpointM; 
 		isVisible = false;
@@ -23,7 +23,7 @@ public class Checkpoint extends Objecte{
 	}
 	void pinta() {
 		g.setColor(Color.WHITE);
-		g.fillRect(x,y,llargada,altura);
+		g.fillOval(x,y,llargada,altura);
 	}
 	void moure() {
 		x=xInicial-joc.c.xFisiques;

@@ -13,14 +13,14 @@ import javax.imageio.ImageIO;
 
 public class Joc implements KeyListener{
 	BufferedImage menuInicial,menuFinal,fons,enemic1,estrella,fonsRecords,menuControls, imatgesMeteorits[]=new BufferedImage[5];
-	BufferedImage imatgesNauXocOriginal[]= new BufferedImage[3],imatgesNau[]= new BufferedImage[3],imatgesNauXoc[] = new BufferedImage[3], foratnegre;
+	BufferedImage imatgesNauXocOriginal[]= new BufferedImage[3],imatgesNau[]= new BufferedImage[3],imatgesNauXoc[] = new BufferedImage[3], foratnegre, bala;
 	File fitxerRecords;
 	Graphics g;
 	Finestra f;
 	Nau c;
 	Minimap map;
 	int llargadaMeteorit1[]=new int[3];
-	int alturaNau,llargadaNau,alturaBales,llargadaBales,alturaMeteorit1,alturaMeteorit2,llargadaMeteorit2,alturaNauEnemiga1,llargadaNauEnemiga1,llargadaForatNegre,alturaForatNegre,llargadaEstrella,alturaEstrella;//mida objectes
+	int alturaNau,llargadaNau,alturaBales,llargadaBales,alturaMeteorit1,alturaMeteorit2,llargadaMeteorit2,alturaNauEnemiga1,llargadaNauEnemiga1,llargadaForatNegre,alturaForatNegre,llargadaEstrella,alturaEstrella, llargadaBala, alturaBala;//mida objectes
 	int alturaMinimapa,llargadaMinimapa,alturaBarres,llargadaBarres,alturaRecords,llargadaRecords, xMenuRecords, yMenuRecords, xTextFinal, yTextFinal, midaLletraRecords, separacioRecords; //mida elements UI
 	int alturaNauM,llargadaNauM,llargadaMeteorit1M, llargadaMeteorit2M,alturaNauEnemiga1M, llargadaNauEnemiga1M, llargadaCheckpointM, alturaCheckpointM,llargadaForatNegreM,midaPuntRadar; //mida elements minimapa
 	//potser agrupar valors de dalt en vectors
@@ -33,7 +33,6 @@ public class Joc implements KeyListener{
 	static Random r = new Random(); //element random que usarem al llarg del codi per a aconseguir valors aleatoris.
 	static double dt=0.1; //l'usem per a les físiques de la nau
 	int lastimmobilex; //x de l'últim enemic immobil generat
-	//provem el radar
 	Joc(Finestra f){
 		this.f=f;
 		this.g=f.g; 
@@ -41,8 +40,6 @@ public class Joc implements KeyListener{
 	void run(){ 
 		Inicialitzacio();
 			while(true) {
-//				System.out.println(alturaMinimapa);
-				c.isTargetable = false; //va bé per fer debugging
 				moviments();
 				generacioEnemics();
 				xocs(); 
@@ -84,7 +81,7 @@ public class Joc implements KeyListener{
 		c.Fisiques(); //calculem com es mou la nau
 		
 		for(int i=0;i<c.nbales;i++) //bales nau
-			c.bales[i].moureDreta();
+			c.bales[i].moureBalaNau();
 		for(int i=0;i<enemics.size();i++) { //enemics
 			
 			//isVisible
@@ -140,10 +137,10 @@ public class Joc implements KeyListener{
 		}
 	}
 	void xocs() {		
-		//XOCS BALES AMB ENEMICS	
+		//XOCS BALES AMB ENEMICS
 		for(int i=0;i<c.nbales;i++) {
 			for(int j=0;j<enemics.size();j++) {
-				if(Math.abs(c.bales[i].x-enemics.get(j).x)<=15 && c.bales[i].y<=enemics.get(j).y+enemics.get(j).altura && c.bales[i].y+1>=enemics.get(j).y && (enemics.get(j).xoc<enemics.get(j).vida) && !inici && !c.bales[i].xoc) {
+				if(Math.abs(c.bales[i].x-enemics.get(j).x-Math.round((float)(enemics.get(j).llargada)/2))<=Math.round((float)(enemics.get(j).llargada)/2) && Math.abs(c.bales[i].y-enemics.get(j).y-Math.round((float)(enemics.get(j).altura)/2))<=Math.round((float)(enemics.get(j).altura)/2) && c.bales[i].y+Bala.altura>=enemics.get(j).y && (enemics.get(j).xoc<enemics.get(j).vida) && !inici && !c.bales[i].xoc) {
 					enemics.get(j).xoc+=1;
 					c.bales[i].xoc=true;
 				}
@@ -152,10 +149,11 @@ public class Joc implements KeyListener{
 				}
 			}
 		}
-		//XOC NAU AMB ENEMICS
+		//XOC NAU AMB ENEMICS //NO ESTÀ BÉ, S'HA DE TENIR EN COMPTE QUE ROTA CANVIA LA MIDA DE LA IMATGE DE LA NAU, HEM DE CREAR XPINTA,YPINTA I MODIFICAR X COM HEM FET A BALA.
 		for(Enemic enemic : enemics) {
 			if (c.isTargetable && !enemic.calculatXoc) { 
-				if((c.y+c.altura>enemic.y)&&(c.y<enemic.y+enemic.altura)&&(Math.abs(enemic.x-c.x)<=30)&&(enemic.xoc<enemic.vida)&&inici==false) { //hem de demanar que el meteorit no hagi estat matat i que no estiguem al menu inicial 
+				if(enemic.x-c.x<c.llargada-1 && c.x-enemic.x<enemic.llargada-1 && enemic.y-c.y<c.altura-1 && c.y-enemic.y<enemic.altura-1 && enemic.xoc<enemic.vida && !inici) {
+//				if(Math.abs(c.x+Math.round((float)(c.llargada)/2)-enemic.x-Math.round((float)(enemic.llargada)/2))<Math.min(c.llargada, enemic.llargada) && Math.abs(c.y+Math.round((float)(c.altura)/2)-enemic.y-Math.round((float)(enemic.altura)/2))<Math.min(enemic.altura, c.altura) && enemic.xoc<enemic.vida && !inici) {
 					c.vida -= enemic.bodyDamage;
 					c.tempsUltimXoc = (int)System.currentTimeMillis();
 					enemic.calculatXoc = true;
@@ -189,16 +187,16 @@ public class Joc implements KeyListener{
 	}
 	void generacioEnemics() {
 		//ENEMICS MOBILS, ANEM GENERANT
-		if(r.nextInt(30)>nivellDificultat("meteorit",27)) { 
+		if(r.nextInt(30)>25) { //posavem aixo per anar pujant dificultat amb el temps nivellDificultat("meteorit",27)
 			enemics.add(new Meteorit1(this));
 		}
-		if(r.nextInt(30)>nivellDificultat("meteoritGran",24)) {
+		if(r.nextInt(30)>22) {
 			enemics.add(new Meteorit2(this));
 			if(r.nextInt(30)>16) { //donem alguna probabilitat diferent de zero a que ens apareixin meteorits grans esquerdats 
 				enemics.get(enemics.size()-1).xoc=1;
 			}
 		} 
-		if(r.nextInt(100)>nivellDificultat("enemic",99)) {
+		if(r.nextInt(100)>99) {
 			enemics.add(new NauEnemiga1(this));
 		}
 	
@@ -208,7 +206,7 @@ public class Joc implements KeyListener{
 		}
 		//ENEMICS IMMOBILS, ANEM GENERANT CADA CERTA DISTÀNCIA RECORREGUDA PER LA NAU
 
-		if((c.xFisiques-lastimmobilex)>400){ //cada 400 pixels forat negre
+		if((c.xFisiques-lastimmobilex)>1000){ //cada 400 pixels forat negre
 			enemics.add(new ForatNegre(this)); 
 			lastimmobilex = c.xFisiques;
 		}
@@ -437,6 +435,10 @@ public class Joc implements KeyListener{
 			foratnegre = ImageIO.read(getClass().getResource("/foratnegre.png"));
 		} catch (IOException e) {
 		}
+		try {
+			bala = ImageIO.read(getClass().getResource("/bala.png"));
+		} catch (IOException e) {
+		}
 		fitxerRecords=new File("records.txt"); //no troba el fitxer quan exportem en runnable jar
 		}
 	BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException { //funció que ens canvia la mida d'una imatge donada
@@ -446,8 +448,8 @@ public class Joc implements KeyListener{
 	    return outputImage;
 	}
 	void calculaMides() { //calcula mides dels objectes en funció de la mida de la pantalla
-		llargadaNau = Math.round(c.llargadaRelativa * f.AMPLADA);
-		alturaNau = Math.round(c.alturaRelativa * f.ALTURA);
+		llargadaNau = Math.round(Nau.llargadaRelativa * f.AMPLADA);
+		alturaNau = Math.round(Nau.alturaRelativa * f.ALTURA);
 		llargadaBales = Math.round(Bala.llargadaRelativa*f.AMPLADA);
 		alturaBales = Math.round(Bala.alturaRelativa*f.ALTURA);
 		llargadaMeteorit1[0] = Math.round(Meteorit1.llargadaRelativa[0]*f.AMPLADA); //meteorit petit amb molt foc
@@ -480,6 +482,8 @@ public class Joc implements KeyListener{
 		llargadaCheckpointM = Math.round(Minimap.llargadaCheckpointRelativa*f.AMPLADA);
 		alturaCheckpointM = Math.round(Minimap.alturaCheckpointRelativa*f.ALTURA);
 		llargadaForatNegreM = Math.round(Minimap.llargadaForatNegreRelativa*f.AMPLADA);
+		alturaBala = Math.round(Bala.alturaRelativa*f.ALTURA);
+		llargadaBala = Math.round(Bala.llargadaRelativa*f.AMPLADA);
 	}
 	void resizeImages()throws IOException{ // canviem la mida de les imatges usant les mides calculades anteriorment
 		for(int i=0; i<3;i++) { 
@@ -493,6 +497,7 @@ public class Joc implements KeyListener{
 		imatgesMeteorits[4] = resizeImage(imatgesMeteorits[4],llargadaMeteorit2,alturaMeteorit2);
 		enemic1 = resizeImage(enemic1,llargadaNauEnemiga1,alturaNauEnemiga1);
 		foratnegre = resizeImage(foratnegre,llargadaForatNegre,alturaForatNegre );
+		bala = resizeImage(bala,llargadaBala,alturaBala);
 		fons=resizeImage(fons,f.AMPLADA,f.ALTURA);
 		menuInicial=resizeImage(menuInicial,f.AMPLADA,f.ALTURA);
 		menuFinal=resizeImage(menuFinal,f.AMPLADA,f.ALTURA);
@@ -502,10 +507,8 @@ public class Joc implements KeyListener{
 	public void generacioMapa() {//ELEMENTS FIXOS DEL MAPA: CHECKPOINTS, "ENEMICS INTEL·LIGENTS"(npcs), BASES ENEMIGUES
 		
 		//checkpoints
-		Checkpoint checkpoint1 = new Checkpoint(this,100,100);
 		Checkpoint checkpoint2 = new Checkpoint(this, 1500,4000);
 		Checkpoint checkpoint3 = new Checkpoint(this, 10000,-100);
-		checkpoints.add(checkpoint1);
 		checkpoints.add(checkpoint2);
 		checkpoints.add(checkpoint3);
 		

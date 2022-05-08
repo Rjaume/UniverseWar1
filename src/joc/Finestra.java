@@ -25,6 +25,7 @@ public class Finestra extends JFrame{
 	Finestra(){//constructor
 		super("Universe War I");
 		setVisible(true);
+		this.setResizable(false);
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		device.setFullScreenWindow(this);
 		try {

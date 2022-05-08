@@ -3,16 +3,22 @@ package joc;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.KeyListener; //listener pel teclat
+import java.awt.event.MouseEvent; 
+import java.awt.event.MouseListener; //listener pels botons del ratolí
+import java.awt.event.MouseMotionListener; //listener pel moviment del ratolí
+import java.awt.image.BufferedImage;
+import java.awt.Graphics2D;
 
-public class Nau extends Objecte implements KeyListener{
-	static int balesInicials=50;
+public class Nau extends Objecte implements KeyListener, MouseListener, MouseMotionListener{
+	static int balesInicials=50; //originalment 50
 	Bala bales[];
+	int xPinta,yPinta; //posició on pintem la imatge de la nau (té mida més grossa que la nau ja que rota ens canvia la mida de les imatges)
 	int nbales; //conta el nombre de bales que queden a la nau. 
 	int n; //l'usem per a l'animació 
 	static float llargadaRelativa = (float)50./1440, alturaRelativa = (float)32./900;//mides de la nau, relatives a la mida de la pantalla. Son els quocients llargada/(amplada pantalla) i altura/(altura pantalla))
+	static float diagonal;
 	static int xBarraVida, yBarraVida=40, llargadaRectangleVida, alturaRectangleVida;  //fixem la posició de la barra de Vida que determina la de la barra de bales
 	int tempsUltimXoc;
 	static int vidaMaxima = 100; //vida maxima de la nau, cada xoc ens restarà un nombre determinat de vida 
@@ -26,13 +32,20 @@ public class Nau extends Objecte implements KeyListener{
 	float FxG,FyG;//forces Fx i Fy degudes al camp gravitatori
 	BufferedImage imatgesNau[] = new BufferedImage[4];
 	BufferedImage imatgesNauXoc[] = new BufferedImage[4];
-	
+	int xRatoli,yRatoli;
+	double alpha; //angle que forma la semirecta definida pel ratolí i la nau i la direcció on apunta actualment la nau
 	Nau(Joc joc){
+		joc.f.addMouseMotionListener(this); //afegim el listener del moviment del ratoli respecte la nostra finestra
+		joc.f.addMouseListener(this);
 		this.joc=joc;
-		x=joc.f.AMPLADA/2-llargada/2; //pintem la nau sempre al centre de la finestra
-		y=joc.f.ALTURA/2-altura/2;
 		llargada = joc.llargadaNau;
 		altura = joc.alturaNau;
+		diagonal = (float)Math.sqrt(llargada*llargada+altura*altura);
+		int midarotacio = Math.round((float)Math.sqrt(llargada*llargada+altura*altura)); //el mateix que a rota però en el cas concret de la nau
+		xPinta=joc.f.AMPLADA/2-midarotacio/2; //pintem la nau sempre al centre de la finestra
+		yPinta=joc.f.ALTURA/2-midarotacio/2; //AQUI HEM DE TENIR EN COMPTE LA NOVA MIDA DONADA A ROTA 
+		x=Math.round((float)joc.f.AMPLADA/2)-Math.round((float)llargada/2); //posició real de la nau
+		y=Math.round((float)joc.f.ALTURA/2)-Math.round((float)altura/2);
 		llargadaRectangleVida = joc.llargadaBarres;
 		alturaRectangleVida = joc.alturaBarres;
 		xBarraVida = Math.round(ContadorBales.xBarraRelativa*llargadaRectangleVida); 
@@ -57,6 +70,8 @@ public class Nau extends Objecte implements KeyListener{
 		Fy=0;
 		Ffx=0;
 		Ffy=0;
+		llargadaMinimapa = joc.llargadaNauM;
+		alturaMinimapa = joc.alturaNauM;
 	}
 	void disparar() { 
 		if(nbales<balesInicials) {
@@ -67,21 +82,23 @@ public class Nau extends Objecte implements KeyListener{
 	}
 	void pinta(Graphics g, int a) { //si enviem a=1 pintem la nau grisa(ho usem per a fer pampallugues quan xoquem)
 		//dibuixem nau
+		alpha = calculaAngle();
+		BufferedImage imatgesNauRotades[]= new BufferedImage[4];
+		BufferedImage imatgesNauXocRotades[] = new BufferedImage[4];
+		for(int i=0;i<4;i++) {
+			imatgesNauRotades[i] = rota(imatgesNau[i],alpha); //provem rota
+			imatgesNauXocRotades[i] = rota(imatgesNauXoc[i],alpha);
+		}
 		if(a==1) {
 			n+=1;
 			n=n%4;
-			g.drawImage(imatgesNauXoc[n],x,y,null);
+			g.drawImage(imatgesNauXocRotades[n],xPinta,yPinta,null);
 		}
 		else {
 			n+=1;
 			n=n%4;
-			g.drawImage(imatgesNau[n],x,y,null);
+			g.drawImage(imatgesNauRotades[n],xPinta,yPinta,null);
 		}
-	}
-	void pintaGris(Graphics g) {
-		n+=1;
-		n=n%4;
-		g.drawImage(imatgesNauXoc[n],x,y,null);
 	}
 	void pintaBarraVida(Graphics g) {
 		g.setColor(Color.WHITE);
@@ -107,17 +124,47 @@ public class Nau extends Objecte implements KeyListener{
 		Vy=0;
 		bales=new Bala[balesInicials];
 	}
-	void Fisiques() { //segurament això ho hauries de tenir en una classe 
+	static BufferedImage rota(BufferedImage entrada, double angle) { //hem de donar angles entre zero i 2PI. (sentit horari), permet rotar qualsevol imatge. El problema és que al rotar la imatge d'un objecte aleshores perdo la posició d'aquest
+		int amplada = entrada.getWidth();
+	    int altura = entrada.getHeight();
+	    double theta = Math.atan((float)altura/amplada); //angle per a fer els càlculs de la rotació 
+	    double cos = Math.cos(angle+theta), sin = Math.sin(angle+theta);
+		int diagonal = Math.round((float)Math.sqrt(amplada*amplada+altura*altura)); 
+		double R = (double)diagonal/2;
+		BufferedImage rotated = new BufferedImage(diagonal, diagonal, entrada.getType());  
+		Graphics2D graphic = rotated.createGraphics();
+		graphic.translate(R-R*cos,R-R*sin); //traslladem el graphics a la posició adecuadada del cercle centrat al centre de rotated de diàmetre diagonal
+		graphic.rotate(angle); //rotem el graphics l'angle desitjat
+		graphic.drawRenderedImage(entrada,null); //i ara pintem la nostra imatge al graphics que està rotat i a la posició adecuada
+		graphic.dispose();
+		return rotated;
+	}
+	double calculaAngle() { 
+		double x = xRatoli;
+		double y = yRatoli;
+		double xCentre = joc.f.AMPLADA/2;
+		double yCentre = joc.f.ALTURA/2;
+		double norma = Math.sqrt((x-xCentre)*(x-xCentre)+(y-yCentre)*(y-yCentre));
+		double alpha=0;
+		if(y-yCentre>=0) {
+			alpha = Math.acos((x-xCentre)/norma);
+		}
+		if(y-yCentre<0) {
+			alpha = 2*Math.PI-Math.acos((x-xCentre)/norma);
+		}
+		return (alpha);
+	}
+	void Fisiques() { //segurament això ho hauriem de tenir en una classe a part
 		
 		//MOVIMENT UNIFORMEMENT ACCELERAT.
 		if(!joc.inici && !mort) {
 		if(fletxaDreta) { 
 			if(Vx<vMax) {//no podem accelerar indefinidament
-				Fx=Nau.F; 
+				Fx=F; 
 			}
 		}
 		if(fletxaEsquerra) { 
-			if(Vx>-50) {//velocitat màxima marxa enrere (fem que no puguem anar més rapid que els meteorits)
+			if(Vx>-vMax) {//velocitat màxima marxa enrere (fem que no puguem anar més rapid que els meteorits)
 				Fx=-F;
 			}
 		}
@@ -197,9 +244,6 @@ public class Nau extends Objecte implements KeyListener{
 		if(e.getKeyCode()==KeyEvent.VK_S && mort==false) {
 			fletxaAvall=true;
 		}
-		if(e.getKeyCode()==32 && mort==false) {
-			disparar();
-		}
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
@@ -215,5 +259,42 @@ public class Nau extends Objecte implements KeyListener{
 		if(e.getKeyCode()==KeyEvent.VK_S) {
 			fletxaAvall=false;
 		}
+	}
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		// TODO Auto-generated method stub
+		xRatoli = e.getX();
+		yRatoli = e.getY();
+		
+	}
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		if(e.getButton()==1 && !mort) {
+			disparar(); //amb el botó dret disparem
+		}
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub			
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 }

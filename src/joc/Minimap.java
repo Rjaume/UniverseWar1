@@ -14,8 +14,7 @@ public class Minimap {
 	static float llargadaMeteorit1Relativa = (float) (2./1440);
 	static float llargadaMeteorit2Relativa = (float) (4./1440);
 	static float llargadaForatNegreRelativa = (float) (2./1440);
-	static float llargadaCheckpointRelativa = (float) (5./1440), alturaCheckpointRelativa = (float) (5./900);
-	static int llargadaNau,alturaNau,llargadaMeteorti1,alturaMeteorit1,llargadaMeteorit2,llargadaCheckpoint,alturaCheckpoint;
+	static float llargadaCheckpointRelativa = (float) (50./1440), alturaCheckpointRelativa = (float) (50./900);
 	static int midaPuntRadar; //mida de l'indicador del radar
 	static int p1,p2; //punt on hem de pintar el quadrat del radar 
 	static Color seethrough_gray = new Color((float)0.5,(float)0.5,(float)0.5,(float)0.5);
@@ -31,8 +30,8 @@ public class Minimap {
 		alturaRectangle = Math.round(altura/3);
 		xR=x+Math.round(llargadaRectangle/2);
 		yR=y+alturaRectangle;
-		x0=x+llargada/2-llargadaNau/2;
-		y0=y+altura/2-alturaNau/2;
+		x0=x+llargada/2-c.llargadaMinimapa/2;
+		y0=y+altura/2-c.alturaMinimapa/2;
 		midaPuntRadar=joc.midaPuntRadar;
 	}
 	void pinta() {
@@ -43,7 +42,7 @@ public class Minimap {
 		g.drawRect(xR,yR,llargadaRectangle,alturaRectangle);
 		//Nau
 		g.setColor(Color.GREEN);
-		g.fillRect(x0,y0,llargadaNau, alturaNau);
+		g.fillRect(x0,y0,c.llargadaMinimapa, c.alturaMinimapa);
 		//Enemics
 		g.setColor(Color.RED); 
 		for (Enemic enemic: joc.enemics) {
@@ -59,7 +58,7 @@ public class Minimap {
 				int xM = xR+llargadaRectangle*checkpoint.x/joc.f.AMPLADA;
 				int yM = yR+alturaRectangle*checkpoint.y/joc.f.ALTURA;
 				g.setColor(Color.WHITE);
-				g.fillRect(xM,yM,checkpoint.llargadaMinimapa,checkpoint.alturaMinimapa);
+				g.fillOval(xM,yM,checkpoint.llargadaMinimapa,checkpoint.alturaMinimapa);
 			}
 			else { //radar fora minimapa
 				calculaPunt(checkpoint);
