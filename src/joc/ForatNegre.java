@@ -1,6 +1,4 @@
 package joc;
-
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class ForatNegre extends Enemic{
@@ -21,7 +19,7 @@ public class ForatNegre extends Enemic{
 	}
 	
 	@Override
-	void pinta(Graphics g) {
+	void pinta() {
 		g.drawImage(foratnegre,x-Math.round((float)(33./100)*llargada),y-Math.round((float)(34./100)*llargada),null); // de manera que x,y correspon a la part esquerre superior del meteorit 
 		//(doncs el png del foratnegre té espai buit als voltants (per a tenir llum per darrera)) (*)
 		
