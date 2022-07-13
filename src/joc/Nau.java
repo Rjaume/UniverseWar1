@@ -9,18 +9,22 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener; //listener pels botons del ratolí
 import java.awt.event.MouseMotionListener; //listener pel moviment del ratolí
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.awt.Graphics2D;
 
 public class Nau extends Objecte implements KeyListener, MouseListener, MouseMotionListener{
-	static int balesInicials=50; //originalment 50
+	static int balesInicials=50
+			; //originalment 50
 	Bala bales[];
 	int xPinta,yPinta; //posició on pintem la imatge de la nau (té mida més grossa que la nau ja que rota ens canvia la mida de les imatges)
+	static int xCentre,yCentre;//posició central de la nau
 	int nbales; //conta el nombre de bales que queden a la nau. 
+	static int velocitatBales = 300;
 	int n; //l'usem per a l'animació 
 	static float llargadaRelativa = (float)50./1440, alturaRelativa = (float)32./900;//mides de la nau, relatives a la mida de la pantalla. Son els quocients llargada/(amplada pantalla) i altura/(altura pantalla))
 	static float diagonal;
 	static int xBarraVida, yBarraVida=40, llargadaRectangleVida, alturaRectangleVida;  //fixem la posició de la barra de Vida que determina la de la barra de bales
-	int tempsUltimXoc;
+	double tempsUltimXoc;
 	static int vidaMaxima = 100; //vida maxima de la nau, cada xoc ens restarà un nombre determinat de vida 
 	int vida; //vida actual de la nau 
 	static int xVida = 10, yVida = 10; //posició de la barra de vida 
@@ -33,15 +37,17 @@ public class Nau extends Objecte implements KeyListener, MouseListener, MouseMot
 	BufferedImage imatgesNau[] = new BufferedImage[4];
 	BufferedImage imatgesNauXoc[] = new BufferedImage[4];
 	int xRatoli,yRatoli;
-	double alpha; //angle que forma la semirecta definida pel ratolí i la nau i la direcció on apunta actualment la nau
+	double alpha; //angle que forma la semirecta definida pel ratolí i la nau i la horitzontal 
 	Nau(Joc joc){
-		joc.f.addMouseMotionListener(this); //afegim el listener del moviment del ratoli respecte la nostra finestra
+		joc.f.addMouseMotionListener(this); //afegim el listener del moviment del ratoli respecte la nostra finestraf
 		joc.f.addMouseListener(this);
 		this.joc=joc;
 		llargada = joc.llargadaNau;
 		altura = joc.alturaNau;
 		diagonal = (float)Math.sqrt(llargada*llargada+altura*altura);
 		int midarotacio = Math.round((float)Math.sqrt(llargada*llargada+altura*altura)); //el mateix que a rota però en el cas concret de la nau
+		xCentre=joc.f.AMPLADA/2;
+		yCentre=joc.f.ALTURA/2;
 		xPinta=joc.f.AMPLADA/2-midarotacio/2; //pintem la nau sempre al centre de la finestra
 		yPinta=joc.f.ALTURA/2-midarotacio/2; //AQUI HEM DE TENIR EN COMPTE LA NOVA MIDA DONADA A ROTA 
 		x=Math.round((float)joc.f.AMPLADA/2)-Math.round((float)llargada/2); //posició real de la nau
@@ -74,8 +80,8 @@ public class Nau extends Objecte implements KeyListener, MouseListener, MouseMot
 		alturaMinimapa = joc.alturaNauM;
 	}
 	void disparar() { 
-		if(nbales<balesInicials) {
-			bales[nbales]=new Bala(joc);
+		if(nbales<balesInicials && !joc.inici) {
+			bales[nbales]=new Bala(this,joc);
 			nbales+=1;
 			joc.contadorBales.balesRestants-=1;
 		}
@@ -124,7 +130,7 @@ public class Nau extends Objecte implements KeyListener, MouseListener, MouseMot
 		Vy=0;
 		bales=new Bala[balesInicials];
 	}
-	static BufferedImage rota(BufferedImage entrada, double angle) { //hem de donar angles entre zero i 2PI. (sentit horari), permet rotar qualsevol imatge. El problema és que al rotar la imatge d'un objecte aleshores perdo la posició d'aquest
+	static BufferedImage rota(BufferedImage entrada, double angle) { //hem de donar angles entre zero i 2PI. (sentit horari)!!!!, permet rotar qualsevol imatge. El problema és que al rotar la imatge d'un objecte aleshores perdo la posició d'aquest
 		int amplada = entrada.getWidth();
 	    int altura = entrada.getHeight();
 	    double theta = Math.atan((float)altura/amplada); //angle per a fer els càlculs de la rotació 

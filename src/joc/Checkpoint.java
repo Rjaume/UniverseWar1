@@ -3,11 +3,6 @@ import java.awt.Graphics;
 import java.awt.Color;
 
 public class Checkpoint extends Objecte{
-	Joc joc;
-	Graphics g;
-	boolean isVisible;
-	boolean isInMinimap;
-	int xInicial,yInicial;
 	public Checkpoint(Joc joc, int x, int y) { //per a crear un checkpoint li donem la posició 
 		this.joc=joc;
 		this.g=joc.g;
