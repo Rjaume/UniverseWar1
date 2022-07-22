@@ -12,8 +12,8 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class Joc implements KeyListener{
-	BufferedImage menuInicial,menuFinal,fons,imatgeEnemic1,imatgeEnemic2,estrella,fonsRecords,menuControls, imatgesMeteorits[]=new BufferedImage[5];
-	BufferedImage imatgesNauXocOriginal[]= new BufferedImage[3],imatgesNau[]= new BufferedImage[3],imatgesNauXoc[] = new BufferedImage[3], foratnegre, bala;
+	BufferedImage menuInicial,menuFinal,fons,imatgeEnemic1,estrella,fonsRecords,menuControls, imatgesMeteorits[]=new BufferedImage[5], imatgeSpinner[] = new BufferedImage[18];
+	BufferedImage imatgesNauXocOriginal[]= new BufferedImage[3],imatgesNau[]= new BufferedImage[3],imatgesNauXoc[] = new BufferedImage[3], imatgesTorreta[] = new BufferedImage[3], foratnegre, bala;
 	File fitxerRecords;
 	Graphics g;
 	Finestra f;
@@ -21,10 +21,10 @@ public class Joc implements KeyListener{
 	Minimap map;
 	int llargadaMeteorit1[]=new int[3];
 	int alturaNau,llargadaNau,alturaBales,llargadaBales,alturaMeteorit1,alturaMeteorit2,llargadaMeteorit2,alturaNauEnemiga1,llargadaNauEnemiga1,llargadaForatNegre,alturaForatNegre,llargadaEstrella,
-	alturaEstrella, llargadaBala, alturaBala, midaPaquetMunicio,midaTorreta;//mida objectes
+	alturaEstrella, llargadaBala, alturaBala, midaPaquetMunicio,midaTorreta, midaSpinner;//mida objectes
 	int alturaMinimapa,llargadaMinimapa,alturaBarres,llargadaBarres,alturaRecords,llargadaRecords, xMenuRecords, yMenuRecords, xTextFinal, yTextFinal, midaLletraRecords, separacioRecords; //mida elements UI
 	int alturaNauM,llargadaNauM,llargadaMeteorit1M, llargadaMeteorit2M,alturaNauEnemiga1M, llargadaNauEnemiga1M, llargadaCheckpointM, alturaCheckpointM,llargadaForatNegreM,midaPuntRadar, //mida elements minimapa
-	midaPaquetMunicioM,midaTorretaM;
+	midaPaquetMunicioM,midaTorretaM, midaSpinnerM;
 	//potser agrupar valors de dalt en vectors
 	boolean calculatRecords,apuntatTemps,inici,records,controls;
 	ContadorTemps contadorTemps; //l'usarem per a contar quants segons durem vius. 
@@ -34,9 +34,9 @@ public class Joc implements KeyListener{
 	ArrayList<Checkpoint> checkpoints = new ArrayList<Checkpoint>();
 	ArrayList<PaquetMunicio> paquetsmunicio = new ArrayList<PaquetMunicio>();
 	ArrayList<Torreta> torretes = new ArrayList<Torreta>();
+	ArrayList<Spinner> spinners = new ArrayList<Spinner>();
 	static Random r = new Random(); //element random que usarem al llarg del codi per a aconseguir valors aleatoris.
 	static double dt=0.1; //l'usem per a les físiques de la nau
-	int lastimmobilex; //x de l'últim enemic immobil generat
 	Joc(Finestra f){
 		this.f=f;
 		this.g=f.g; 
@@ -44,10 +44,9 @@ public class Joc implements KeyListener{
 	void run(){ 
 		Inicialitzacio();
 			while(true) {
-				//debugging
-//				c.isTargetable=false;
+//				c.isTargetable = false;
 				moviments();
-				generacioEnemics();
+				generacioMeteorits();
 				xocs(); 
 				repintar();
 				if(!inici) {
@@ -62,7 +61,7 @@ public class Joc implements KeyListener{
 				}
 			}
 	}
-	void Inicialitzacio(){
+	void Inicialitzacio() {
 		loadResources(); //obtenim les imatges i fitxers que farem servir 
 		calculaMides(); //calculem mides dels objectes en funció de la mida de la pantalla
 		try {
@@ -79,127 +78,72 @@ public class Joc implements KeyListener{
 		inici=true;
 		records=false;
 	}
-	void moviments() { //moviments de la nau, enemics, bales i estrelles i dispars dels enemics
+	void moviments() { //Moviments de la nau, enemics, bales i estrelles i dispars dels enemics
 		
-		c.Fisiques(); //calculem com es mou la nau
+		c.Fisiques(); //Calculem com es mou la nau
 		
-		//bales nau
-		for(int i=0;i<c.nbales;i++) { //les bales un cop passen a ser no visibles no ho tornen a ser mai
+		for(int i=0;i<c.nbales;i++) { //Les bales un cop passen a ser no visibles no ho tornen a ser mai
 			if(c.bales[i].isVisible) {
-			c.bales[i].moure();
-			if(Math.abs(c.bales[i].x-c.x)>f.AMPLADA*2 || Math.abs(c.bales[i].y-c.y)>f.ALTURA*2) {
-				c.bales[i].isVisible=false;
-			}
+				c.bales[i].moure();
+				if(Math.abs(c.bales[i].x-c.x)>f.AMPLADA*2 || Math.abs(c.bales[i].y-c.y)>f.ALTURA*2) c.bales[i].isVisible=false;
 			}
 		}
-		
-		//enemics
-		for(int i=0;i<enemics.size();i++) { 
+		//Enemics
+		for(Enemic enemic : enemics) {
 			
 			//isVisible
-			if(Math.abs(c.x-enemics.get(i).x)>f.AMPLADA*2 || Math.abs(c.y-enemics.get(i).y)>f.ALTURA*2) {
-				enemics.get(i).isVisible=false;
-			}else {
-				enemics.get(i).isVisible=true;
-			}
-			//isInMinmap
-			if(Math.abs(c.x-enemics.get(i).x)<f.AMPLADA && Math.abs(c.y-enemics.get(i).y)<f.ALTURA+0.5*f.ALTURA) {
-				enemics.get(i).isInMinimap = true;
-			}
-			else {
-				enemics.get(i).isInMinimap = false;
-			}
-			//movem
-			if(!enemics.get(i).mort) {
-				enemics.get(i).moure();
-			}
-			else {
-				enemics.get(i).particules.moure();
-			}
-			
-			//disparem
-			if(enemics.get(i) instanceof NauEnemiga1) {
-				for(int j=0;j<(enemics.get(i)).bales.size();j++) {
-					((enemics.get(i)).bales.get(j)).moure();
-				}
-				if(enemics.get(i).mort==false) {
-					enemics.get(i).dispara();
-				}
-		}
-		}
-		
-		for(int i=0;i<torretes.size();i++) { //torretes
-			
-			//isVisible
-			if(Math.abs(c.x-torretes.get(i).xCentre)>f.AMPLADA/2+midaTorreta || Math.abs(c.y-torretes.get(i).yCentre)>f.ALTURA/2+midaTorreta) { // no sé si s'hauria d'ajustar 
-				torretes.get(i).isVisible=false;
-			}else {
-				torretes.get(i).isVisible=true;
+			if(!(enemic instanceof NauEnemiga2)) { //s'ha de treure
+			if(Math.abs(c.x-enemic.x)>f.AMPLADA/2+enemic.llargada | Math.abs(c.y-enemic.y)>f.ALTURA/2+enemic.altura) enemic.isVisible = false;
+			else enemic.isVisible = true;
 			}
 			
 			//isInMinimap
-			if(Math.abs(c.x-torretes.get(i).x)<f.AMPLADA && Math.abs(c.y-torretes.get(i).y)<f.ALTURA+0.5*f.ALTURA) {
-				torretes.get(i).isInMinimap = true;
-			}
-			else {
-				torretes.get(i).isInMinimap = false;
-			}
+			if(Math.abs(c.x-enemic.x)<f.AMPLADA && Math.abs(c.y-enemic.y)<f.ALTURA+0.5*f.ALTURA) enemic.isInMinimap = true;
+			else enemic.isInMinimap = false;
 			
-			//movem
-			if(!torretes.get(i).mort) { //hem de moure encara que no sigui visible perquè potser "es mou" a un lloc on torna a ser visible
-				torretes.get(i).moure();
-			}
-			else{
-				torretes.get(i).particules.moure();
-			}
-			//disparem
-			if(!torretes.get(i).mort && torretes.get(i).isVisible) {
-				torretes.get(i).dispara();
-			}
+			//Move
+			if(!enemic.mort) enemic.moure();
+			else enemic.particules.moure();
 			
-			//movem bales
-			for(int j=0;j<(torretes.get(i)).bales.size();j++) { //les bales un cop passen a ser no visibles no ho tornen a ser mai
-				if(((torretes.get(i)).bales.get(j)).isVisible) {
-					((torretes.get(i)).bales.get(j)).moure();
-					if(Math.abs(torretes.get(i).bales.get(j).x-c.x)>f.AMPLADA*2 || Math.abs(torretes.get(i).bales.get(j).y-c.y)>f.ALTURA*2) {
-						((torretes.get(i)).bales.get(j)).isVisible=false;
-					}
+			//Shoot
+			if((enemic instanceof NauEnemiga1 | enemic instanceof Torreta | enemic instanceof Spinner)) {
+				for(Bala bala : enemic.bales) {
+					if(bala.isVisible) bala.moure();
+					if(Math.abs(bala.x-c.x)>f.AMPLADA*2 | Math.abs(bala.y-c.y)>f.ALTURA*2) bala.isVisible = false;
 				}
-				}
+			if(!enemic.mort & enemic.isVisible) enemic.dispara();
 			}
-		
-		for(int i=0;i<estrelles.size();i++) {//estrelles de fons
+		}
+		//Estrelles de fons
+		for(int i=0;i<estrelles.size();i++) {
 			estrelles.get(i).moure();
 		}
-		for(int i=0;i<checkpoints.size();i++) {//checkpoints
-			
+		//Checkpoints
+		for(int i=0;i<checkpoints.size();i++) {
 			//isVisible
 			if(Math.abs(c.x-checkpoints.get(i).x)>f.AMPLADA*2 || Math.abs(c.y-checkpoints.get(i).y)>f.ALTURA*2) {
 				checkpoints.get(i).isVisible=false;
-			}else {
-				checkpoints.get(i).isVisible=true;
-			}
+			}else checkpoints.get(i).isVisible=true;
 			
 			//isInMinimap
 			if(Math.abs(c.x-checkpoints.get(i).x)<f.AMPLADA && Math.abs(c.y-checkpoints.get(i).y)<f.ALTURA+0.5*f.ALTURA) {
 				checkpoints.get(i).isInMinimap = true;
 			}
-			else {
-				checkpoints.get(i).isInMinimap = false;
-			}
+			else checkpoints.get(i).isInMinimap = false;
 			
-			//movem
+			//Move
 			checkpoints.get(i).moure();
-			
 		}
 		for(int i=0;i<paquetsmunicio.size();i++) { //paquets munició
 			//isVisible
+			
 			if(Math.abs(c.x-paquetsmunicio.get(i).x)>f.AMPLADA*2 || Math.abs(c.y-paquetsmunicio.get(i).y)>f.ALTURA*2) {
 				paquetsmunicio.get(i).isVisible=false;
 			}else {
 				paquetsmunicio.get(i).isVisible=true;
 			}
 			//isInMinimap
+			
 			if(Math.abs(c.x-paquetsmunicio.get(i).x)<f.AMPLADA && Math.abs(c.y-paquetsmunicio.get(i).y)<f.ALTURA+0.5*f.ALTURA) {
 				paquetsmunicio.get(i).isInMinimap = true;
 			}
@@ -212,106 +156,64 @@ public class Joc implements KeyListener{
 		}
 	}
 	void xocs() {		
-		
-		//XOCS BALES AMB ENEMIC
-		for(int i=0;i<c.nbales;i++) {
-			for(Enemic enemic : enemics) {
-				if(Math.abs(c.bales[i].x-enemic.x-Math.round((float)(enemic.llargada)/2))<=Math.round((float)(enemic.llargada)/2) && Math.abs(c.bales[i].y-enemic.y-Math.round((float)(enemic.altura)/2))<=Math.round((float)(enemic.altura)/2) && c.bales[i].y+Bala.altura>=enemic.y && (enemic.xoc<enemic.vida) && !inici && !c.bales[i].xoc) {
-					enemic.xoc+=1;
-					c.bales[i].xoc=true;
-				}
-				if(enemic.xoc>=enemic.vida && !enemic.hasParticles) {
-					enemic.mort=true;
-					enemic.particules = new ParticleSystem(this, enemic); //si matem l'objecte fem que apareixin partícules
-					enemic.hasParticles = true;
-					
+		//Bales nau amb enemics
+		for(int i=0; i<c.nbales; i++) { 
+			for(Enemic enemic : enemics) if(!enemic.mort & enemic.isInMinimap & !(c.bales[i].xoc) & enemic.hitBox.intersects(c.bales[i].hitBox)) {
+				enemic.xoc+=1;
+				c.bales[i].xoc = true;
+				if(enemic.xoc >= enemic.vida) {
+					enemic.mort = true;
+					enemic.particules = new ParticleSystem(this,enemic);
 				}
 			}
 		}
-		//XOC NAU AMB ENEMICS //NO ESTÀ BÉ, S'HA DE TENIR EN COMPTE QUE ROTA CANVIA LA MIDA DE LA IMATGE DE LA NAU, HEM DE CREAR XPINTA,YPINTA I MODIFICAR X COM HEM FET A BALA.
-		for(Enemic enemic : enemics) {
-			if(c.isTargetable && enemic.x-c.x<c.llargada-1 && c.x-enemic.x<enemic.llargada-1 && enemic.y-c.y<c.altura-1 && c.y-enemic.y<enemic.altura-1 && enemic.xoc<enemic.vida && !inici) {
+		//Nau amb enemics
+		for(Enemic enemic : enemics) if(c.isTargetable & enemic.isVisible & enemic.hitBox.intersects(c.hitBox)) {
 				c.vida-=enemic.bodyDamage;
 				c.tempsUltimXoc = System.currentTimeMillis(); //això ja fa que amb un xoc només perdem un cop la vida que hem de perdre.
-			}
 		}
 		
-		//XOC BALES ENEMICS AMB NAU
-		for(int i=0;i<enemics.size();i++) {
-			for(int j=0;j<enemics.get(i).bales.size();j++) {
-					if(c.isTargetable && (c.x-enemics.get(i).bales.get(j).x<=10)&&(enemics.get(i).bales.get(j).x-c.x<=c.llargada)&&(enemics.get(i).bales.get(j).y-c.y>=-1)&&(enemics.get(i).bales.get(j).y-c.y<=c.altura)&&(enemics.get(i).bales.get(j).xoc==false)&&(c.mort==false)&&(inici==false)) {
-						c.vida -= Bala.bulletDamage; //s'haura de canviar si en algun moment posem diferents tipus de bales
-						c.tempsUltimXoc = System.currentTimeMillis();
-				}	
-			}
-		}
-		//XOCS NAU AMB PAQUETS DE MUNICIÓ
-		for(int i=0;i<paquetsmunicio.size();i++) {
-			if(!paquetsmunicio.get(i).agafat && c.x-paquetsmunicio.get(i).x<=midaPaquetMunicio && c.x-paquetsmunicio.get(i).x>=-c.llargada && c.y-paquetsmunicio.get(i).y>=-c.altura && c.y-paquetsmunicio.get(i).y<=midaPaquetMunicio) {
-				paquetsmunicio.get(i).agafat=true;
-				contadorBales.balesRestants+=Math.min(paquetsmunicio.get(i).bales,c.nbales);
-				c.nbales-=Math.min(paquetsmunicio.get(i).bales,c.nbales);
-			}
-		}
-		//XOCS NAU AMB TORRETES
-		for(Torreta torreta: torretes) {
-			if(c.isTargetable && !torreta.mort && c.x-torreta.x<=midaTorreta && c.x-torreta.x>=-c.llargada && c.y-torreta.y>=-c.altura && c.y-torreta.y<=midaTorreta) {
-				c.vida-=torreta.bodyDamage;
-				c.tempsUltimXoc = System.currentTimeMillis();
-			}
-			//XOCS NAU AMB BALES TORRETES
-			for(Bala bala: torreta.bales) {
-				if(c.isTargetable && c.x-bala.x<=10 && bala.x-c.x<=c.llargada && bala.y-c.y>=-1 && bala.y-c.y<=c.altura && bala.xoc==false && c.mort==false && inici==false) {
-					c.vida -= Bala.bulletDamage;
+		//Bales enemics amb nau
+		for(Enemic enemic : enemics) {
+			for(Bala bala : enemic.bales) if(c.isTargetable & c.hitBox.intersects(bala.hitBox) & !bala.xoc & !c.mort & !inici) {
+					c.vida -= Bala.bulletDamage; //s'haura de canviar si en algun moment posem diferents tipus de bales
 					c.tempsUltimXoc = System.currentTimeMillis();
-				}
-			}
-			//XOCS BALES NAU AMB TORRETES
-			for(int i=0;i<c.nbales;i++) {
-				if(torreta.isVisible && Math.abs(c.bales[i].x-torreta.x-Math.round((float)(torreta.llargada)/2))<=Math.round((float)(torreta.llargada)/2) && Math.abs(c.bales[i].y-torreta.y-Math.round((float)(torreta.altura)/2))<=Math.round((float)(torreta.altura)/2) && c.bales[i].y+Bala.altura>=torreta.y && (torreta.xoc<torreta.vida) && !inici && !c.bales[i].xoc) {
-					torreta.xoc+=1;
-					c.bales[i].xoc=true;
-				}
-				if(torreta.xoc>=torreta.vida && !torreta.hasParticles) {
-					torreta.mort=true;
-					torreta.particules = new ParticleSystem(this, torreta); //si matem l'objecte fem que apareixin partícules
-					torreta.hasParticles = true;
-				}
+			}	
+		}
+				
+		//Nau amb paquets de munició
+		for(PaquetMunicio paquet : paquetsmunicio) {
+			if(!paquet.agafat & c.hitBox.intersects(paquet.hitBox)) {
+				paquet.agafat=true;
+				contadorBales.balesRestants+=Math.min(paquet.bales,c.nbales);
+				c.nbales-=Math.min(paquet.bales,c.nbales);
 			}
 		}
-		
 		
 		//AQUI HI HAURIA D'HAVER XOCS AMB CHECKPOINTS QUE FARIEN SORTIR UN MENÚ ON FER MILLORES A LA NAU/ALTRES.
-		
 		//MIREM SI S'HA MORT LA NAU
-		if(c.vida <= 0) {
-			c.mort = true;
-		}
+		if(c.vida <= 0) c.mort = true;
 	}
-	void generacioEnemics() {
-		//ENEMICS MOBILS, ANEM GENERANT
-		if(r.nextInt(30)>25) { //posavem aixo per anar pujant dificultat amb el temps nivellDificultat("meteorit",27)
+	void generacioMeteorits() {
+		
+		//meteorits
+		int random  = r.nextInt(100); //potser prendre 1000 així puc afinar més
+		if(random>70) { //posavem aixo per anar pujant dificultat amb el temps nivellDificultat("meteorit",27) //70
 			enemics.add(new Meteorit1(this));
 		}
-		if(r.nextInt(30)>22) {
+		if(random>75) {//75
 			enemics.add(new Meteorit2(this));
 			if(r.nextInt(30)>16) { //donem alguna probabilitat diferent de zero a que ens apareixin meteorits grans esquerdats 
 				enemics.get(enemics.size()-1).xoc=1;
 			}
 		} 
-		if(r.nextInt(100)>99) {
+		if(random>98) {
 			enemics.add(new NauEnemiga1(this));
 		}
-	
-		//GENERACIÓ ESTRELLES, SUPOSO QUE MÉS ENDAVANT FAREM UNA FUNCIÓ QUE ES DIGUI GENERAMAPA O POTSER GENERAFONS
-		if(r.nextInt(100)>30) {
+		
+		//estrelles
+		if(random>30) {
 			estrelles.add(new Estrella(this));
-		}
-		//ENEMICS IMMOBILS, ANEM GENERANT CADA CERTA DISTÀNCIA RECORREGUDA PER LA NAU
-
-		if((c.xFisiques-lastimmobilex)>1000){ //cada 400 pixels forat negre
-			enemics.add(new ForatNegre(this)); 
-			lastimmobilex = c.xFisiques;
 		}
 	}
 	void restart() {
@@ -319,74 +221,44 @@ public class Joc implements KeyListener{
 		c.restartValues(); //resetegem els valors de les variables associades a la nau 
 		contadorTemps=new ContadorTemps(this,g); //creem un nou contador
 		contadorBales=new ContadorBales(this);
-		ArrayList<Enemic> m = new ArrayList<Enemic>(); //si que ens interessa resetejar aquest vector perquè sinó sen's farà molt gran, això fa que si 
-		this.enemics=m;								   //si posem elements a enemics a generacioMapa() no serveixi de res.
+		ArrayList<Enemic> m = new ArrayList<Enemic>(); //si que ens interessa resetejar aquest vector perquè sinó sen's farà molt gran
+		this.enemics=m;								   
 		ArrayList<Checkpoint> ck = new ArrayList<Checkpoint>();
 		this.checkpoints=ck;
 		ArrayList<Torreta> tr = new ArrayList<Torreta>();
 		this.torretes = tr;
 		calculatRecords=false;
 		contadorBales.balesRestants=Nau.balesInicials;
-		lastimmobilex = -10000;
 		generacioMapa();
 	}
 	void repintar() {
 		g.drawImage(fons,0,0,null);
-		if(inici==false) {
-			//DIBUIXEM ESTRELLES, si ja porten cert temps dibuixades no les dibuixem 
-			for(int i=0;i<estrelles.size();i++) {
-				if(estrelles.get(i).isVisible){
-				estrelles.get(i).pinta(g);
-				}
-			}
+		if(!inici) {
+			//ESTRELLES, si ja porten cert temps dibuixades no les dibuixem 
+			for(Estrella estrella : estrelles) if(estrella.isVisible) estrella.pinta();
+			
 			//DIBUIXEM BALES
-			for(int i=0;i<c.nbales;i++){
-				if(c.bales[i].xoc==false && c.mort==false && c.bales[i].isVisible) { //si les bales no han xocat i la nau esta viva les pintem. 
-				c.bales[i].pinta(g);
-				}
+			for(int i=0;i<c.nbales;i++){ //Si les bales no han xocat i la nau esta viva les pintem. 
+				if(!c.bales[i].xoc & !c.mort & c.bales[i].isVisible) c.bales[i].pinta();
 			}
-			for(int i=0;i<enemics.size();i++) {
-				for(int j=0;j<enemics.get(i).bales.size();j++) {
-					if(enemics.get(i).bales.get(j).xoc==false && enemics.get(i).bales.get(j).isVisible) { 
-						enemics.get(i).bales.get(j).pinta(g); //pintaBalaenemic
-					}
-				}
-			}
+			for(Enemic enemic : enemics) for(Bala bala : enemic.bales) bala.pinta();
+			
 			//DIBUIXEM ENEMICS
-			for(int i=0;i<enemics.size();i++) {
-				if(!enemics.get(i).mort && enemics.get(i).isVisible) { 
-					enemics.get(i).pinta();
-				}
-				if(enemics.get(i).mort) {
-					enemics.get(i).particules.pinta();
-				}
+			for(Enemic enemic : enemics) {
+				if(!enemic.mort & enemic.isVisible) enemic.pinta();
+				if(enemic.mort) enemic.particules.pinta();
 			}
+			
 			//DIBUIXEM CHECKPOINTS
-			for(int i=0;i<checkpoints.size();i++) {
-				if(checkpoints.get(i).isVisible) {
-					checkpoints.get(i).pinta();
-				}
+			for(Checkpoint checkpoint : checkpoints) {
+				if(checkpoint.isVisible) checkpoint.pinta();
 			}
+			
 			//DIBUIXEM PAQUETS DE MUNICIÓ
-			for(int i=0;i<paquetsmunicio.size();i++) {
-				if(!paquetsmunicio.get(i).agafat) {
-					paquetsmunicio.get(i).pinta();
-				}
+			for(PaquetMunicio paquetmunicio : paquetsmunicio) {
+				if(!paquetmunicio.agafat) paquetmunicio.pinta();
 			}
-			//DIBUIXEM TORRETES
-			for(int i=0;i<torretes.size();i++) {
-				for(int j=0;j<torretes.get(i).bales.size();j++) {
-					if(!torretes.get(i).bales.get(j).xoc && torretes.get(i).bales.get(j).isVisible) {
-						torretes.get(i).bales.get(j).pinta(g);
-					}
-				}
-				if(!torretes.get(i).mort && torretes.get(i).isVisible) {
-					torretes.get(i).pinta();
-				}
-				if(torretes.get(i).mort) {
-					torretes.get(i).particules.pinta();
-				}
-			}
+			
 			if(!c.mort) {
 				//DIBUIXEM NAU BARRA VIDA I BARRA MUNICIÓ
 				int dtemps = (int) Math.abs(c.tempsUltimXoc-System.currentTimeMillis()); //aqui regulem com ens avisa la nau que ha xocat amb un objecte
@@ -420,27 +292,19 @@ public class Joc implements KeyListener{
 				}
 			}
 		
-		if(inici) { //al menu d'inici ensenyem enemics de fons i estrelles
+		if(inici) { //al menu d'inici ensenyem meteorits de fons i estrelles
 			for(int i=0;i<estrelles.size();i++) {
 				if(estrelles.get(i).isVisible) {
-					estrelles.get(i).pinta(g);
+					estrelles.get(i).pinta();
 				}
 			}
-			for(int i=0;i<enemics.size();i++) {
-				if(!(enemics.get(i) instanceof NauEnemiga1) && enemics.get(i).isVisible) {
-				enemics.get(i).pinta();
-				}
-			}
-			if(!records && !controls) {
-				g.drawImage(menuInicial,0,0,null); //ensenyem el menu inicial últim per a que els meteorits es vegin per sota. 
-			} 
-			if(records && !controls && !inici){
+			for(Enemic enemic : enemics) if((enemic instanceof Meteorit1 | enemic instanceof Meteorit2) & enemic.isVisible) enemic.pinta();
+			if(!records & !controls) g.drawImage(menuInicial,0,0,null); //ensenyem el menu inicial últim per a que els meteorits es vegin per sota. 
+			if(records & !controls & !inici){
 			g.drawImage(fonsRecords,0,0,null);
 			contadorTemps.pintaRecords();
 			}
-			if(controls && !records) {
-				g.drawImage(menuControls,0,0,null);
-			}
+			if(controls & !records) g.drawImage(menuControls,0,0,null);
 		}
 	}
 	int nivellDificultat(String tipus,int i) { //ens permet regular la dificultat a mesura que portem més estona a una partida 
@@ -484,93 +348,6 @@ public class Joc implements KeyListener{
 		}
 		return i;
 	}
-	void loadResources() {
-		try {
-			fons = ImageIO.read(getClass().getResource("/fons.png"));
-		} catch (IOException e) {
-		}
-		try {
-			menuInicial = ImageIO.read(getClass().getResource("/menuinicial.png"));
-		} catch (IOException e) {
-		}
-		try {
-		    menuFinal = ImageIO.read(getClass().getResource("/menufinal.png"));
-		} catch (IOException e) { 
-		}
-		try {
-			imatgesNau[0] = ImageIO.read(getClass().getResource("/nauespacial1.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNau[1] = ImageIO.read(getClass().getResource("/nauespacial2.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNau[2] = ImageIO.read(getClass().getResource("/nauespacial3.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[0] = ImageIO.read(getClass().getResource("/meteorit1.png")); 
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[1] = ImageIO.read(getClass().getResource("/meteorit2.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[2] = ImageIO.read(getClass().getResource("/meteorit3.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[3] = ImageIO.read(getClass().getResource("/meteorit21.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesMeteorits[4] = ImageIO.read(getClass().getResource("/meteorit22.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgeEnemic1 = ImageIO.read(getClass().getResource("/enemic1.png"));
-		} catch (IOException e) {
-		}
-		try {
-			estrella = ImageIO.read(getClass().getResource("/estrella.png"));
-		} catch (IOException e) {
-		}
-		try {
-			fonsRecords = ImageIO.read(getClass().getResource("/records.png"));
-		} catch (IOException e) {
-		}
-		try {
-			menuControls = ImageIO.read(getClass().getResource("/controls.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNauXoc[0] = ImageIO.read(getClass().getResource("/nauespacial1grey.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNauXoc[1] = ImageIO.read(getClass().getResource("/nauespacial2grey.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgesNauXoc[2] = ImageIO.read(getClass().getResource("/nauespacial3grey.png"));
-		} catch (IOException e) {
-		}
-		try {
-			foratnegre = ImageIO.read(getClass().getResource("/foratnegre.png"));
-		} catch (IOException e) {
-		}
-		try {
-			bala = ImageIO.read(getClass().getResource("/bala.png"));
-		} catch (IOException e) {
-		}
-		try {
-			imatgeEnemic2 = ImageIO.read(getClass().getResource("/enemic2.png"));
-		} catch (IOException e) {
-		}
-		fitxerRecords=new File("records.txt"); //no troba el fitxer quan exportem en runnable jar
-		}
 	BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException { //funció que ens canvia la mida d'una imatge donada
 	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH); //hi ha altres algorismes 
 	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB); //type_int_argb respecta la transperència
@@ -618,6 +395,8 @@ public class Joc implements KeyListener{
 		midaPaquetMunicioM = Math.round(Minimap.midaPaquetMunicioRelativa*f.AMPLADA);
 		midaTorreta = Math.round(Torreta.llargadaRelativa*f.AMPLADA);
 		midaTorretaM = Math.round(Minimap.midaTorretaRelativa*f.AMPLADA);
+		midaSpinner = Math.round(Spinner.midaRelativa * f.AMPLADA);
+		midaSpinnerM = Math.round(Minimap.midaSpinnerRelativa * f.AMPLADA);
 	}
 	void resizeImages()throws IOException{ // canviem la mida de les imatges usant les mides calculades anteriorment
 		for(int i=0; i<3;i++) { 
@@ -626,6 +405,9 @@ public class Joc implements KeyListener{
 		} 
 		for(int i=0;i<3;i++) {
 			imatgesMeteorits[i] = resizeImage(imatgesMeteorits[i],llargadaMeteorit1[i],alturaMeteorit1);
+		}
+		for(int i =0 ;i<18;i++) { 
+			imatgeSpinner[i] = resizeImage(imatgeSpinner[i],midaSpinner,midaSpinner);
 		}
 		imatgesMeteorits[3] = resizeImage(imatgesMeteorits[3],llargadaMeteorit2,alturaMeteorit2);
 		imatgesMeteorits[4] = resizeImage(imatgesMeteorits[4],llargadaMeteorit2,alturaMeteorit2);
@@ -637,7 +419,7 @@ public class Joc implements KeyListener{
 		menuFinal=resizeImage(menuFinal,f.AMPLADA,f.ALTURA);
 		menuControls=resizeImage(menuControls,f.AMPLADA,f.ALTURA);
 		fonsRecords=resizeImage(fonsRecords,f.AMPLADA,f.ALTURA);
-		imatgeEnemic2 = resizeImage(imatgeEnemic2, midaTorreta*2,midaTorreta*2); //multiplico per dos perquè la imatge de la torreta és el doble de llarga i el doble de ample que la torreta en si
+		for(int i=0;i<3;i++) imatgesTorreta[i] = resizeImage(imatgesTorreta[i], midaTorreta*2,midaTorreta*2); //multiplico per dos perquè la imatge de la torreta és el doble de llarga i el doble de ample que la torreta en si
 	}
 	public void generacioMapa() { //ELEMENTS FIXOS DEL MAPA: CHECKPOINTS, npcs, BASES ENEMIGUES ... 
 		
@@ -648,20 +430,107 @@ public class Joc implements KeyListener{
 //		checkpoints.add(checkpoint3);
 		
 		//paquets de munició
-		PaquetMunicio paquet1 = new PaquetMunicio(this, 2600,900,25);
-		PaquetMunicio paquet2 = new PaquetMunicio(this, 5000,800,25);
-		PaquetMunicio paquet3 = new PaquetMunicio(this, 1700,9000,25);
-		PaquetMunicio paquet4 = new PaquetMunicio(this, -700,565,25);
-		paquetsmunicio.add(paquet1);
-		paquetsmunicio.add(paquet2);
-		paquetsmunicio.add(paquet3);
-		paquetsmunicio.add(paquet4);
+//		PaquetMunicio paquet1 = new PaquetMunicio(this, 2600,900,25);
+//		PaquetMunicio paquet2 = new PaquetMunicio(this, 5000,800,25);
+//		PaquetMunicio paquet3 = new PaquetMunicio(this, 1700,9000,25);
+//		PaquetMunicio paquet4 = new PaquetMunicio(this, -700,565,25);
+//		paquetsmunicio.add(paquet1);
+//		paquetsmunicio.add(paquet2);
+//		paquetsmunicio.add(paquet3);
+//		paquetsmunicio.add(paquet4);
 		
 		//torretes
-		Torreta torreta1 = new Torreta(this,300,300,0.5);
-		Torreta torreta2 = new Torreta(this,2000,500,0.1);
-		torretes.add(torreta1);
-		torretes.add(torreta2);
+		Torreta torreta1 = new Torreta(this,800,1200,0.5,8,100);
+		enemics.add(torreta1);
+		Torreta torreta3 = new Torreta(this, 600, 300, 2, 1, 300);
+		enemics.add(torreta3);
+		
+//		Torreta torreta2 = new Torreta(this,600,300,0.5,4,120);
+//		enemics.add(torreta2);
+		
+		//spinners
+//		Spinner spinner1 = new Spinner(this,500,300);
+//		enemics.add(spinner1);
+		
+//		forats negre
+		ForatNegre foratnegre1 = new ForatNegre(this,100,300);
+		enemics.add(foratnegre1);
+		
+//		Naus enemigues 1
+//		NauEnemiga1 nau1 = new NauEnemiga1(this,900,300);
+//		enemics.add(nau1);
+		
+		//Naus enemigues 2
+//		NauEnemiga2 nau2 = new NauEnemiga2(this,500,500);
+//		enemics.add(nau2);
+		
+		
+//		torreta1.bales.add(new Bala(this, torreta1, 100, 0));
+	}
+	void loadResources() {
+		try {
+			fons = ImageIO.read(getClass().getResource("/fons.png"));
+		} catch (IOException e) {
+		}
+		try {
+			menuInicial = ImageIO.read(getClass().getResource("/menuinicial.png"));
+		} catch (IOException e) {
+		}
+		try {
+		    menuFinal = ImageIO.read(getClass().getResource("/menufinal.png"));
+		} catch (IOException e) { 
+		}
+		for(int i=1;i<6;i++) {
+			try {
+				imatgesMeteorits[i-1] = ImageIO.read(getClass().getResource("/meteorit"+i+".png")); 
+			} catch (IOException e) {
+			}	
+		}
+		try {
+			imatgeEnemic1 = ImageIO.read(getClass().getResource("/enemic1.png"));
+		} catch (IOException e) {
+		}
+		try {
+			estrella = ImageIO.read(getClass().getResource("/estrella.png"));
+		} catch (IOException e) {
+		}
+		try {
+			fonsRecords = ImageIO.read(getClass().getResource("/records.png"));
+		} catch (IOException e) {
+		}
+		try {
+			menuControls = ImageIO.read(getClass().getResource("/controls.png"));
+		} catch (IOException e) {
+		}
+		for(int i=1;i<4;i++) {
+			try {
+				imatgesNauXoc[i-1] = ImageIO.read(getClass().getResource("/nauespacial"+i+"grey.png"));
+			} catch (IOException e) {
+			}
+			try {
+				imatgesNau[i-1] = ImageIO.read(getClass().getResource("/nauespacial"+i+".png"));
+			} catch (IOException e) {
+			}
+		}
+		try {
+			foratnegre = ImageIO.read(getClass().getResource("/foratnegre.png"));
+		} catch (IOException e) {
+		}
+		try {
+			bala = ImageIO.read(getClass().getResource("/bala.png"));
+		} catch (IOException e) {
+		}
+		try {
+			for(int i=1;i<4;i++) imatgesTorreta[i-1] = ImageIO.read(getClass().getResource("/torreta"+i+".png"));
+		} catch (IOException e) {
+		}
+		for(int i =1 ;i<19;i++) { 
+			try {
+				imatgeSpinner[i-1] = ImageIO.read(getClass().getResource("/spinner"+i+".png"));
+			} catch (IOException e) {
+			}
+		}
+		fitxerRecords=new File("records.txt"); //no troba el fitxer quan exportem en runnable jar
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {

@@ -17,17 +17,16 @@ public class Finestra extends JFrame{
 	Image im; //tècnica doble buffer
 	Graphics g;
 	JLabel label1;
-	static GraphicsDevice device = GraphicsEnvironment
-	        .getLocalGraphicsEnvironment().getScreenDevices()[0]; // canviant el zero s'escull la pantalla on es juga en cas de tenir més d'una pantalla
+	static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]; // canviant el zero s'escull la pantalla on es juga en cas de tenir més d'una pantalla
 	public static void main(String[] args) {
 		new Finestra();
 	}
 	Finestra(){//constructor
 		super("Universe War I");
 		setVisible(true);
-		this.setResizable(false); //false (si ho poso a true llavors no puc disparar a la zona on tinc el dock de l'ordinador)
+		this.setResizable(true); //false (si ho poso a true llavors no puc disparar a la zona on tinc el dock de l'ordinador)
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		device.setFullScreenWindow(this);
+		device.setFullScreenWindow(this); //no funciona per windows
 		try {
 			Thread.sleep(1000); //esperem un segon a que s'obri la pantalla per a definir les mides a sota 
 			//(podriem ensenyar algun icona per a dir que està carregant)

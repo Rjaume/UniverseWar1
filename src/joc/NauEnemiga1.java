@@ -1,6 +1,7 @@
 package joc;
 
 import java.awt.image.BufferedImage;
+import java.awt.Rectangle;
 
 public class NauEnemiga1 extends Enemic {
 	BufferedImage nauEnemiga1;
@@ -27,6 +28,7 @@ public class NauEnemiga1 extends Enemic {
 		color[2] = 255;
 		midaParticules = 7; //mida mitjana partícules
 		nombreParticules = 10;
+		hitBox = new Rectangle(x,y,llargada,altura);
 	}
 	public NauEnemiga1(Joc joc, int x, int y) { //constructor per a poder situar l'enemic on volem
 		super(joc,x,y);
@@ -41,11 +43,12 @@ public class NauEnemiga1 extends Enemic {
 		this.nauEnemiga1=joc.imatgeEnemic1;
 		isVisible = true;
 		tempsUltimTret=100;
-		color[0] = 255;
-		color[1] = 255;
-		color[2] = 255;
+		color[0] = 230;
+		color[1] = 230;
+		color[2] = 230;
 		midaParticules = 7;
 		this.nombreParticules = 10;
+		hitBox = new Rectangle(x,y,llargada,altura);
 	}
 	void pinta() {
 		g.drawImage(nauEnemiga1,x,y,null);
@@ -55,10 +58,11 @@ public class NauEnemiga1 extends Enemic {
 		x=xInicial-joc.c.xFisiques+varX;
 		y=yInicial-joc.c.yFisiques;
 		varX-=v;
+		((Rectangle) hitBox).setLocation(x,y);
 	}
 	void dispara() {
 		if(Math.abs(tempsUltimTret-System.currentTimeMillis())>tempsEntreTrets*1000) {
-		bales.add(new Bala(this,joc));
+		bales.add(new Bala(joc,this));
 		tempsUltimTret=System.currentTimeMillis();
 		}
 	}

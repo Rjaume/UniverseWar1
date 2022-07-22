@@ -17,6 +17,7 @@ public class Minimap {
 	static float llargadaCheckpointRelativa = (float) (50./1440), alturaCheckpointRelativa = (float) (50./900);
 	static float midaPaquetMunicioRelativa = (float) (2./1440);
 	static float midaTorretaRelativa = (float) (3./1440);
+	static float midaSpinnerRelativa = (float) (3./1440);
 	static int midaPuntRadar; //mida de l'indicador del radar
 	static int p1,p2; //punt on hem de pintar el quadrat del radar 
 	static Color seethrough_gray = new Color((float)0.5,(float)0.5,(float)0.5,(float)0.5);
@@ -46,8 +47,9 @@ public class Minimap {
 		g.setColor(Color.GREEN);
 		g.fillRect(x0,y0,c.llargadaMinimapa, c.alturaMinimapa);
 		//Enemics
-		g.setColor(Color.RED); 
 		for (Enemic enemic: joc.enemics) {
+			if(enemic instanceof Meteorit1 | enemic instanceof Meteorit2 | enemic instanceof ForatNegre) g.setColor(Color.RED);
+			else g.setColor(Color.BLUE);
 			if(enemic.isInMinimap && !enemic.mort) {
 				int xM = xR+llargadaRectangle*enemic.x/joc.f.AMPLADA;
 				int yM = yR+alturaRectangle*enemic.y/joc.f.ALTURA;

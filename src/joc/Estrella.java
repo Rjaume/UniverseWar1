@@ -1,6 +1,5 @@
 package joc;
 
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -8,13 +7,12 @@ public class Estrella extends Objecte{
 	BufferedImage imatge;
 	int xInicial,yInicial,varX,v;
 	static float llargadaRelativa = (float)1./1440, alturaRelativa = (float)1./900; //mides relatives a la mida de la pantalla
-	Joc joc;
 	static int maxGeneracio;
 	double temps; // ens permetrà saber quant temps porta existint l'estrella per a 
 	//no dibuixar-la al cap d'un temps 
-	boolean isVisible; 
 	public Estrella(Joc joc) {
 		this.joc=joc;
+		this.g = joc.g;
 		maxGeneracio=3*joc.f.ALTURA/2+1000;
 		this.xInicial=Joc.r.nextInt(joc.f.AMPLADA)+joc.c.xFisiques;
 		this.yInicial=Joc.r.nextInt(2*maxGeneracio)-maxGeneracio+joc.c.yFisiques;
@@ -38,7 +36,7 @@ public class Estrella extends Objecte{
 		isVisible=true;
 	}
 
-	void pinta(Graphics g) {
+	void pinta() {
 		g.drawImage(imatge,x,y,null);
 	}
 	void moure() {
