@@ -4,5 +4,8 @@ I am currently working on the mechanics therefore the gameplay is not extremely 
 
 My objective is to develop it into a rogue-like game which will be based on advancing through a map while killing enemies and improving the player's spaceship.
 
-https://user-images.githubusercontent.com/68929395/178786352-2c93be67-9790-4458-b201-a8e0906198f4.mov
+
+
+
+https://user-images.githubusercontent.com/68929395/180457387-9c9eeb13-46bd-4590-b292-fdbea908ddec.mov
 
