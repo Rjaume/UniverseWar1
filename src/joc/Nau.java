@@ -3,14 +3,14 @@ package joc;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener; //listener pel teclat
-import java.awt.event.MouseEvent; 
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener; //listener pels botons del ratolí
 import java.awt.event.MouseMotionListener; //listener pel moviment del ratolí
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.awt.Graphics2D;
 
 public class Nau extends Objecte implements KeyListener, MouseListener, MouseMotionListener{
 	static int balesInicials=50
@@ -38,6 +38,8 @@ public class Nau extends Objecte implements KeyListener, MouseListener, MouseMot
 	BufferedImage imatgesNauXoc[] = new BufferedImage[4];
 	int xRatoli,yRatoli;
 	double alpha; //angle que forma la semirecta definida pel ratolí i la nau i la horitzontal 
+	int r ; //per a randomitzar cap on esquiva la nauEnemiga2
+	Rectangle hitBox;
 	Nau(Joc joc){
 		joc.f.addMouseMotionListener(this); //afegim el listener del moviment del ratoli respecte la nostra finestraf
 		joc.f.addMouseListener(this);
@@ -78,13 +80,16 @@ public class Nau extends Objecte implements KeyListener, MouseListener, MouseMot
 		Ffy=0;
 		llargadaMinimapa = joc.llargadaNauM;
 		alturaMinimapa = joc.alturaNauM;
+		hitBox = new Rectangle(x,y,llargada,altura);
+		r = 1;
 	}
 	void disparar() { 
 		if(nbales<balesInicials && !joc.inici) {
-			bales[nbales]=new Bala(this,joc);
+			bales[nbales]=new Bala(joc,this);
 			nbales+=1;
 			joc.contadorBales.balesRestants-=1;
 		}
+		r = Joc.r.nextInt(2);
 	}
 	void pinta(Graphics g, int a) { //si enviem a=1 pintem la nau grisa(ho usem per a fer pampallugues quan xoquem)
 		//dibuixem nau
@@ -187,11 +192,13 @@ public class Nau extends Objecte implements KeyListener, MouseListener, MouseMot
 		
 		if(Math.abs(Vx)<1) { //Si la velocitat és molt propera a zero no donem força de fregament. 
 			Ffx=0;
+			Vx = 0;
 		}else {
 			Ffx=Ff;
 		}
 		if(Math.abs(Vy)<1) {
 			Ffy=0;
+			Vy = 0;
 		}else {
 			Ffy=Ff;
 		}

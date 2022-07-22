@@ -29,7 +29,7 @@ public class ParticleSystem extends Objecte {
 	}
 	void pinta() {
 		for(int i=0;i<nombreParticules; i++) {
-			particles[i].pinta();
+			if(particles[i].isVisible) particles[i].pinta();
 		}
 	}
 }

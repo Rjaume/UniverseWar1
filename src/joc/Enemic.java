@@ -11,10 +11,7 @@ public abstract class Enemic extends Objecte {
 	int M; //mass of the enemy, for the enemies in which physics apply (right now only blackholes)
 	boolean isNegligible; //si l'enemic es pot negligir per a les fisiques, for the enemies in which physics apply (right now only blackholes)
 	int maxGeneracio;
-	Joc joc;
 	ArrayList<Bala> bales = new ArrayList<Bala>();
-	boolean mort;
-	ParticleSystem particules;
 	public Enemic(Joc joc) {
 		this.joc=joc;
 		this.g=joc.g;
@@ -28,7 +25,6 @@ public abstract class Enemic extends Objecte {
 		varX=0;
 		isVisible=false;
 		calculatXoc = false;
-		hasParticles = false;
 	}
 	public Enemic(Joc joc,boolean a) { //constructor per objectes rotats
 		this.joc=joc;
@@ -36,7 +32,7 @@ public abstract class Enemic extends Objecte {
 		this.calculatXoc = false;
 		maxGeneracio = 3*joc.f.AMPLADA/2+1000;
 		float angleGeneracio; //NO M'AGRADA
-		if(Joc.r.nextInt()%100>95) { //5 per cent de possibilitats que el meteorit vingui de qualsevol direcció i senttit
+		if(Joc.r.nextInt()%100>95) { //5 per cent de possibilitats que el meteorit vingui de qualsevol direcció i senttit // 95
 		angleGeneracio= (float) (Joc.r.nextInt()%360*(2*Math.PI/360)); //angle que ens determina on es genera el nostre enemic
 		}else { //la majoria de meteorits venen de davant 
 			angleGeneracio = (float) (Joc.r.nextInt()%16*(2*Math.PI/360));
@@ -49,7 +45,6 @@ public abstract class Enemic extends Objecte {
 		varX=0;
 		isVisible=false;
 		calculatXoc = false;
-		hasParticles = false;
 	}
 	public Enemic(Joc joc, int x, int y) { //constructor per a situar enemics a una posició concreta
 		this.joc=joc;
@@ -58,7 +53,6 @@ public abstract class Enemic extends Objecte {
 		this.y=y;
 		xInicial = x;
 		yInicial = y;
-		hasParticles = false;
 	}
 	abstract void pinta();
 	abstract void dispara();

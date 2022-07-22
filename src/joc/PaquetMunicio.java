@@ -1,6 +1,7 @@
 package joc;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
 public class PaquetMunicio extends Objecte{
 	int bales; //quantitat de bales que conté el paquet
@@ -21,6 +22,7 @@ public class PaquetMunicio extends Objecte{
 		alturaMinimapa = joc.midaPaquetMunicioM;
 		llargada = joc.midaPaquetMunicio;
 		altura = joc.midaPaquetMunicio;
+		hitBox = new Rectangle(x,y,llargada,altura);
 	}
 	void pinta() {
 		g.setColor(Color.GREEN);
@@ -29,5 +31,6 @@ public class PaquetMunicio extends Objecte{
 	void moure() {
 		x=xInicial-joc.c.xFisiques;
 		y=yInicial-joc.c.yFisiques;
+		hitBox.setLocation(x,y);
 	}
 }

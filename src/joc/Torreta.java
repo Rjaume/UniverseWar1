@@ -1,29 +1,41 @@
 package joc;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.Color;
-import java.util.ArrayList;
 
 public class Torreta extends Enemic{
 	double tempsUltimTret;
+	int nombreDeCanons;
 	BufferedImage imatge;
 	int xCentre, yCentre;
 	int mitjaDiagonal;
 	boolean mort;
 	Double angleNau; //angle respecte l'horitzontal de la torreta per a estar apuntant la nau
 	double tempsEntreTrets; //en segons 
-	static int velocitatBales = 120;
-	ArrayList<Bala> bales = new ArrayList<Bala>();
+	int velocitatBales;
+	static double angle4 = Math.PI*1/2, angle8 = Math.PI*1/4;
 	static float llargadaRelativa = (float)40./1440, alturaRelativa = (float)40./900; // a canviar quan fem el disseny
-	public Torreta(Joc joc, int x,  int y, double tempsEntreTrets ) {
+	public Torreta(Joc joc, int x,  int y, double tempsEntreTrets, int nombreDeCanons,int velocitatBales) {
 		super(joc,x,y);
+		this.velocitatBales = velocitatBales;
 		this.llargada = joc.midaTorreta;
 		this.altura = joc.midaTorreta;
 		this.llargadaMinimapa = joc.midaTorretaM;
 		this.alturaMinimapa = joc.midaTorretaM;
 		this.tempsEntreTrets = tempsEntreTrets;
+		this.nombreDeCanons = nombreDeCanons; // 1, 4 o 8
 		bodyDamage = 10;
-		imatge = joc.imatgeEnemic2;
+		switch(nombreDeCanons) {
+		case 1:
+			imatge = joc.imatgesTorreta[0];
+			break;
+		case 4:
+			imatge = joc.imatgesTorreta[1];
+			break;
+		case 8:
+			imatge = joc.imatgesTorreta[2];
+			break;
+		}
 		vida = 5;
 		xoc = 0;
 		tempsUltimTret = 0;
@@ -36,16 +48,27 @@ public class Torreta extends Enemic{
 		color[2] = 255;
 		midaParticules = 8; //mida mitjana particules
 		nombreParticules = 12;
+		hitBox = new Rectangle(x,y,llargada,altura);
 	}
 	void pinta() {
 		BufferedImage imatgeRotada = Nau.rota(imatge, angleNau);
 		g.drawImage(imatgeRotada,x-(mitjaDiagonal-llargada/2),y-(mitjaDiagonal-altura/2),null);//la imatge és més gran que la torreta realment, per tant restem (tenim en compte rota()) 
-	}
+	}	
 	void dispara() {
 		if(Math.abs(tempsUltimTret-System.currentTimeMillis())>tempsEntreTrets*1000) {
-				tempsUltimTret=System.currentTimeMillis();
-				bales.add(new Bala(this,joc));
-			}
+			tempsUltimTret=System.currentTimeMillis();
+		switch(nombreDeCanons) {
+		case 1:
+				bales.add(new Bala(joc,this));
+			break;
+		case 4:
+			for(int i=0;i<4;i++) bales.add(new Bala(joc, this, velocitatBales, angleNau + angle4*i));
+			break;
+		case 8:
+			for(int i=0;i<8;i++) bales.add(new Bala(joc,this,velocitatBales, angleNau + angle8*i));
+			break;
+		}
+		}
 	}
 	void moure() {
 		x=xInicial-joc.c.xFisiques;
@@ -65,5 +88,6 @@ public class Torreta extends Enemic{
 		if(yd<0 && xd>0) {
 			angleNau = 2*Math.PI - Math.atan(-yd/xd);
 		}	
+		hitBox.setLocation(x,y);
 	}
 }

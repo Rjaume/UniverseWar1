@@ -1,11 +1,15 @@
 package joc;
 
 import java.awt.image.BufferedImage;
+import java.awt.Rectangle;
+import java.awt.Color;
 
 public class Meteorit2 extends Enemic{
 	BufferedImage meteorit,meteoritEsquerdat;
 	static float llargadaRelativa = (float)90./1440, alturaRelativa = (float)90./900; //mides relatives a la mida de la pantalla
 	float angle; //angle de la trajectòria del meteorit respecte l'eix de les x en radians
+	int xPinta, yPinta;
+	int diagonal;
 	BufferedImage imatgeRotada1,imatgeRotada2;
 	int vx,vy;
 	public Meteorit2(Joc joc) {
@@ -32,14 +36,20 @@ public class Meteorit2 extends Enemic{
 		color[2] = 20;
 		midaParticules = 6; //mida mitjana particules 10
 		nombreParticules =20;//12
+		diagonal= Math.round((float)Math.sqrt(llargada*llargada+altura*altura)); 
+		xPinta = x - diagonal/2+llargada/2;
+		yPinta = y - diagonal/2+altura/2;
+		xCentre = Math.round((float)(xPinta+diagonal/2)); 
+		yCentre = Math.round((float)(yPinta+diagonal/2));
+		hitBox = new Rectangle(xCentre-llargada/2,yCentre-altura/2,llargada,altura);
 	}
 	
 	void pinta() {
 		if(this.xoc==0) {
-			g.drawImage(imatgeRotada1,x,y,null);
+			g.drawImage(imatgeRotada1,xPinta,yPinta,null);
 		}
 		if(this.xoc==1) {
-			g.drawImage(imatgeRotada2,x,y,null);
+			g.drawImage(imatgeRotada2,xPinta,yPinta,null);
 		}
 	}
 	void moure() {
@@ -47,9 +57,11 @@ public class Meteorit2 extends Enemic{
 		y=yInicial-joc.c.yFisiques+varY;
 		varY-=vy;
 		varX-=vx;
-//		x=xInicial-joc.c.xFisiques+varX;
-//		y=yInicial-joc.c.yFisiques;
-//		varX-=v;
+		xPinta = x - diagonal/2+llargada/2;
+		yPinta = y - diagonal/2+altura/2;
+		xCentre = x + llargada/2;
+		yCentre = y + altura/2;
+		hitBox.setLocation(x,y);
 	}
 	void dispara() {
 	}
