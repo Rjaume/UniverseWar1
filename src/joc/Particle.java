@@ -1,5 +1,6 @@
 package joc;
 import java.awt.Color;
+import java.awt.Rectangle;
 
 public class Particle extends Objecte {
 	double v0x;
@@ -11,6 +12,8 @@ public class Particle extends Objecte {
 		this.g = joc.g;
 		this.xInicial = xInicial;
 		this.yInicial = yInicial;
+		x = xInicial-joc.c.xFisiques;
+		y = yInicial-joc.c.yFisiques;
 		int rvx = Joc.r.nextInt()%ParticleSystem.velocitat/4; //afegim part aleatòria a la velocitat de cada partícula del sistema de particules
 		int rvy = Joc.r.nextInt()%ParticleSystem.velocitat/4;
 		this.v0x = v0x+rvx;
@@ -30,6 +33,7 @@ public class Particle extends Objecte {
 		this.color[2] = Math.min(this.color[2],255);
 		varX = 0;
 		varY = 0;
+		hitBox = new Rectangle(x,y,mida,mida);
 		isVisible = true;
 	}
 	void moure() {
@@ -38,6 +42,7 @@ public class Particle extends Objecte {
 			y=Math.round(yInicial-joc.c.yFisiques+varY);
 			varX+=v0x*Joc.dt;
 			varY+=v0y*Joc.dt;
+			hitBox.setLocation(x,y);
 			}
 	}
 	void pinta() {

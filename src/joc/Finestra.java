@@ -1,5 +1,6 @@
 package joc;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
@@ -16,6 +17,7 @@ public class Finestra extends JFrame{
 	int AMPLADA, ALTURA; //current size of the game screen 
 	Image im; //tècnica doble buffer
 	Graphics g;
+	Graphics2D g2; // l'usem per a modificar l'opacitat d'alguns objectes que volem mostrar per pantalla. A Graphics2D podem modificar la opacitat i a Graphics no
 	JLabel label1;
 	static GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()[0]; // canviant el zero s'escull la pantalla on es juga en cas de tenir més d'una pantalla
 	public static void main(String[] args) {
@@ -37,6 +39,7 @@ public class Finestra extends JFrame{
 		ALTURA=getContentPane().getSize().height;
 		im=this.createImage(AMPLADA,ALTURA);
 		g=im.getGraphics();
+		g2 = (Graphics2D)g;
 		j=new Joc(this);
 		j.run();
 		

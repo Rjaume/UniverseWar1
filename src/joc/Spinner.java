@@ -1,5 +1,6 @@
 package joc;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 public class Spinner extends Enemic {
 	double angleNau; //per a fer l'atac
@@ -10,26 +11,29 @@ public class Spinner extends Enemic {
 		super(joc, x, y);
 		v=8; //velocitat de l'atac
 		hitBox = new Rectangle(x,y,llargada,altura);
-		this.altura = joc.midaSpinner;
-		this.llargada = joc.midaSpinner;
+		altura = joc.midaSpinner;
+		llargada = joc.midaSpinner;
 		llargadaMinimapa = joc.midaSpinnerM;
 		alturaMinimapa = joc.midaSpinnerM;
 		hitBox = new Rectangle(x,y,llargada,altura);
 		mort = false;
 		isVisible = true;
 		n=0;
-		vida=1;
-		bodyDamage = 10;
+		vida=10;
+		bodyDamage = 20;
 		nombreParticules = 5;
 		midaParticules = 8;
 		color[0] = 0;
 		color[1] = 100;
 		color[2] = 200;
+		nombreImatges = 18;
+		imatges = new BufferedImage[nombreImatges];
+		for(int i=0;i<18;i++) imatges[i] = joc.imatgeSpinner[i];
 	}
 
 	@Override
 	void pinta() {
-		g.drawImage(joc.imatgeSpinner[n],x,y,null);
+		g.drawImage(imatges[n],x,y,null);
 		n+=1;
 		n=n%18;
 	}

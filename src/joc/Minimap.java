@@ -13,11 +13,14 @@ public class Minimap {
 	static float llargadaNauRelativa = (float) (4./1440), alturaNauRelativa = (float) (3./900);
 	static float llargadaMeteorit1Relativa = (float) (2./1440);
 	static float llargadaMeteorit2Relativa = (float) (4./1440);
+	static float midaNauEnemiga1Relativa = (float) (4./1440);
 	static float llargadaForatNegreRelativa = (float) (2./1440);
-	static float llargadaCheckpointRelativa = (float) (50./1440), alturaCheckpointRelativa = (float) (50./900);
+	static float llargadaCheckpointRelativa = (float) (3./1440), alturaCheckpointRelativa = (float) (3./900);
 	static float midaPaquetMunicioRelativa = (float) (2./1440);
 	static float midaTorretaRelativa = (float) (3./1440);
 	static float midaSpinnerRelativa = (float) (3./1440);
+	static float llargadaNauEnemiga2Relativa = (float) (4./1440);
+	static float alturaNauEnemiga2Relativa = (float) (3./900);
 	static int midaPuntRadar; //mida de l'indicador del radar
 	static int p1,p2; //punt on hem de pintar el quadrat del radar 
 	static Color seethrough_gray = new Color((float)0.5,(float)0.5,(float)0.5,(float)0.5);

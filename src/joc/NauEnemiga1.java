@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
 
 public class NauEnemiga1 extends Enemic {
-	BufferedImage nauEnemiga1;
 	static float llargadaRelativa = (float)50./1440, alturaRelativa = (float)50./900; //mides relatives a la mida de la pantalla
 	static int tempsEntreTrets=2; //en segons
 	double tempsUltimTret;
@@ -15,12 +14,16 @@ public class NauEnemiga1 extends Enemic {
 		this.v=6;
 		this.xoc=0;
 		this.mort=false;
-		llargada=joc.llargadaNauEnemiga1;
-		altura=joc.alturaNauEnemiga1;
-		alturaMinimapa = 4;
-		llargadaMinimapa = 4;
+		llargada=joc.midaNauEnemiga1;
+		altura=llargada;
+		xCentre = x + llargada/2;
+		yCentre = y + altura/2;
+		alturaMinimapa = joc.midaNauEnemiga1M;
+		llargadaMinimapa = alturaMinimapa;
 		vida=1;
-		this.nauEnemiga1=joc.imatgeEnemic1;
+		nombreImatges = 1;
+		imatges = new BufferedImage[nombreImatges];
+		imatges[0] = joc.imatgeNauEnemiga1;
 		isVisible=false;
 		tempsUltimTret=0;
 		color[0] = 255;//color mitjà particules
@@ -35,12 +38,12 @@ public class NauEnemiga1 extends Enemic {
 		this.v=0;
 		this.xoc =0;
 		this.mort=false;
-		llargada=joc.llargadaNauEnemiga1;
-		altura=joc.alturaNauEnemiga1;
-		alturaMinimapa = 4;
-		llargadaMinimapa = 4;
+		llargada=joc.midaNauEnemiga1;
+		altura=llargada;
+		alturaMinimapa = joc.midaNauEnemiga1M;
+		llargadaMinimapa = alturaMinimapa;
 		vida =1;
-		this.nauEnemiga1=joc.imatgeEnemic1;
+		imatges[0] = joc.imatgeNauEnemiga1;
 		isVisible = true;
 		tempsUltimTret=100;
 		color[0] = 230;
@@ -51,12 +54,14 @@ public class NauEnemiga1 extends Enemic {
 		hitBox = new Rectangle(x,y,llargada,altura);
 	}
 	void pinta() {
-		g.drawImage(nauEnemiga1,x,y,null);
+		g.drawImage(imatges[0],x,y,null);
 	}
 	
 	void moure() {
 		x=xInicial-joc.c.xFisiques+varX;
 		y=yInicial-joc.c.yFisiques;
+		xCentre = x + llargada/2;
+		yCentre = y + altura/2;
 		varX-=v;
 		((Rectangle) hitBox).setLocation(x,y);
 	}

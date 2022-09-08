@@ -1,16 +1,21 @@
 package joc;
 
 import java.util.ArrayList;
+import java.awt.image.BufferedImage;
 
 public abstract class Enemic extends Objecte {
 	int v,xoc,vida,balesInicials;
-	int varX,varY; //moviment de l'enemic cap a la esquerre
+	int varX,varY; //moviment de l'enemic 
+	int nombreImatges;
+	BufferedImage imatges[];
 	int bodyDamage; //número que es restarà a la vida de la nau cada cop que xoquem amb un enemic (depèn de cada tipus d'enemic)
 	boolean calculatXoc; //val true si ja hem tingut en compte el xoc d'aquest enemic amb la nau i false si no (així només restem un cop el damage a la vida de la nau)
 	CampGravitatori campgravitatori; //camp gravitatori associat a l'enemic (només per forats negres ara mateix)
 	int M; //mass of the enemy, for the enemies in which physics apply (right now only blackholes)
 	boolean isNegligible; //si l'enemic es pot negligir per a les fisiques, for the enemies in which physics apply (right now only blackholes)
 	int maxGeneracio;
+	int r; //per a randomitzar cap on esquiven els objectes que esquiven els enemics
+	int xPinta, yPinta;
 	ArrayList<Bala> bales = new ArrayList<Bala>();
 	public Enemic(Joc joc) {
 		this.joc=joc;
@@ -22,7 +27,7 @@ public abstract class Enemic extends Objecte {
 		x=xInicial;
 		y=yInicial;
 		varX=0;
-		varX=0;
+		varY=0;
 		isVisible=false;
 		calculatXoc = false;
 	}
@@ -30,7 +35,8 @@ public abstract class Enemic extends Objecte {
 		this.joc=joc;
 		this.g=joc.g;
 		this.calculatXoc = false;
-		maxGeneracio = 3*joc.f.AMPLADA/2+1000;
+		maxGeneracio = 3*joc.f.AMPLADA/2+4000; //he d'evitar generar meteorits a dins la nau enemiga
+//		maxGeneracio = 3*joc.f.AMPLADA/2+1000 //la millor solució és demanar-ho explicit al generar
 		float angleGeneracio; //NO M'AGRADA
 		if(Joc.r.nextInt()%100>95) { //5 per cent de possibilitats que el meteorit vingui de qualsevol direcció i senttit // 95
 		angleGeneracio= (float) (Joc.r.nextInt()%360*(2*Math.PI/360)); //angle que ens determina on es genera el nostre enemic
@@ -42,7 +48,7 @@ public abstract class Enemic extends Objecte {
 		x=xInicial;
 		y=yInicial;
 		varX=0;
-		varX=0;
+		varY=0;
 		isVisible=false;
 		calculatXoc = false;
 	}

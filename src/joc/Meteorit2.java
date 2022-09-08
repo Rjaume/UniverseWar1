@@ -8,9 +8,7 @@ public class Meteorit2 extends Enemic{
 	BufferedImage meteorit,meteoritEsquerdat;
 	static float llargadaRelativa = (float)90./1440, alturaRelativa = (float)90./900; //mides relatives a la mida de la pantalla
 	float angle; //angle de la trajectòria del meteorit respecte l'eix de les x en radians
-	int xPinta, yPinta;
 	int diagonal;
-	BufferedImage imatgeRotada1,imatgeRotada2;
 	int vx,vy;
 	public Meteorit2(Joc joc) {
 		super(joc,true);
@@ -21,10 +19,10 @@ public class Meteorit2 extends Enemic{
 		this.vy = Math.round((float)(v*Math.sin(angle)));
 		this.xoc=0; //nombre de xocs inicials és 0
 		this.mort=false;
-		meteorit=joc.imatgesMeteorits[3];
-		meteoritEsquerdat=joc.imatgesMeteorits[4];
-		this.imatgeRotada1 = Nau.rota(meteorit,angle);
-		this.imatgeRotada2 = Nau.rota(meteoritEsquerdat,angle);
+		nombreImatges = 2;
+		imatges = new BufferedImage[2];
+		imatges[0] = Nau.rota(joc.imatgesMeteorits[3], angle);
+		imatges[1] = Nau.rota(joc.imatgesMeteorits[4], angle);
 		llargada=joc.llargadaMeteorit2;
 		altura=joc.alturaMeteorit2;
 		vida=2;
@@ -42,14 +40,15 @@ public class Meteorit2 extends Enemic{
 		xCentre = Math.round((float)(xPinta+diagonal/2)); 
 		yCentre = Math.round((float)(yPinta+diagonal/2));
 		hitBox = new Rectangle(xCentre-llargada/2,yCentre-altura/2,llargada,altura);
+		r = Joc.r.nextInt(2);
 	}
 	
 	void pinta() {
 		if(this.xoc==0) {
-			g.drawImage(imatgeRotada1,xPinta,yPinta,null);
+			g.drawImage(imatges[0],xPinta,yPinta,null);
 		}
 		if(this.xoc==1) {
-			g.drawImage(imatgeRotada2,xPinta,yPinta,null);
+			g.drawImage(imatges[1],xPinta,yPinta,null);
 		}
 	}
 	void moure() {

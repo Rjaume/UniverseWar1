@@ -8,8 +8,10 @@ public class ParticleSystem extends Objecte {
 	public ParticleSystem(Joc joc, Objecte objecte) {
 		this.joc = joc;
 		this.g = joc.g;
-		this.xInicial = objecte.x+joc.c.xFisiques; //prendre objecte.xInicial i yInicial no funciona pels metoerits
-		this.yInicial = objecte.y+joc.c.yFisiques;
+		this.xInicial = objecte.xCentre+joc.c.xFisiques; //he de sumar les físiques perquè aleshores a moure, les resto i ja les he restat a objecte.xCentre, objecte.yCentre
+		this.yInicial = objecte.yCentre+joc.c.yFisiques;
+		x = xInicial;
+		y = yInicial;
 		llargada = objecte.midaParticules;
 		nombreParticules = objecte.nombreParticules;
 		alpha = 2*Math.PI/nombreParticules;

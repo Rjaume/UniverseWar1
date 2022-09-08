@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 public class Torreta extends Enemic{
 	double tempsUltimTret;
 	int nombreDeCanons;
-	BufferedImage imatge;
 	int xCentre, yCentre;
 	int mitjaDiagonal;
 	boolean mort;
@@ -25,15 +24,17 @@ public class Torreta extends Enemic{
 		this.tempsEntreTrets = tempsEntreTrets;
 		this.nombreDeCanons = nombreDeCanons; // 1, 4 o 8
 		bodyDamage = 10;
+		nombreImatges = 1;
+		imatges = new BufferedImage[nombreImatges];
 		switch(nombreDeCanons) {
 		case 1:
-			imatge = joc.imatgesTorreta[0];
+			imatges[0] = joc.imatgesTorreta[0];
 			break;
 		case 4:
-			imatge = joc.imatgesTorreta[1];
+			imatges[0] = joc.imatgesTorreta[1];
 			break;
 		case 8:
-			imatge = joc.imatgesTorreta[2];
+			imatges[0] = joc.imatgesTorreta[2];
 			break;
 		}
 		vida = 5;
@@ -51,7 +52,7 @@ public class Torreta extends Enemic{
 		hitBox = new Rectangle(x,y,llargada,altura);
 	}
 	void pinta() {
-		BufferedImage imatgeRotada = Nau.rota(imatge, angleNau);
+		BufferedImage imatgeRotada = Nau.rota(imatges[0], angleNau);
 		g.drawImage(imatgeRotada,x-(mitjaDiagonal-llargada/2),y-(mitjaDiagonal-altura/2),null);//la imatge és més gran que la torreta realment, per tant restem (tenim en compte rota()) 
 	}	
 	void dispara() {
